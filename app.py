@@ -1,4 +1,7 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 import uuid
 import re
 from difflib import SequenceMatcher
@@ -46,7 +49,19 @@ app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 if not app.config["SECRET_KEY"]:
     raise RuntimeError("SECRET_KEY environment variable is not set.")
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///cec_lost_found.db"
+database_url = os.environ.get("DATABASE_URL")
+
+if database_url:
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace(
+            "postgres://",
+            "postgresql://",
+            1
+        )
+else:
+    database_url = "sqlite:///cec_lost_found.db"
+
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 app.config["UPLOAD_FOLDER"] = os.path.join(
