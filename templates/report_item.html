@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#100b19">
+    <title>CEC | Report an Item</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <style>
+        :root {
+            --bg: #100817;
+            --surface: rgba(27,27,49,.92);
+            --purple: #a020f0;
+            --pink: #e04de8;
+            --text: #f7f2ff;
+            --muted: #aaa0bd;
+        }
+
+        * { box-sizing: border-box; }
+
+        html {
+            min-height: 100%;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 12px 16px;
+            overflow-x: hidden;
+            color: var(--text);
+            background:
+                radial-gradient(ellipse at 12% 18%,rgba(236,72,153,.30),transparent 38%),
+                radial-gradient(ellipse at 88% 25%,rgba(192,38,211,.25),transparent 40%),
+                radial-gradient(ellipse at 50% 100%,rgba(147,51,234,.24),transparent 48%),
+                linear-gradient(135deg,#100817,#1b0b20 48%,#100b1b);
+            background-attachment: fixed;
+            font-family: Inter,"Segoe UI",Arial,sans-serif;
+        }
+
+        /* NATURAL PARTICLE NETWORK */
+
+        #particle-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .background-effects {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .background-effects::before {
+            content: "";
+            position: absolute;
+            inset: -50%;
+            background:
+                radial-gradient(ellipse at 25% 35%,rgba(236,72,153,.32),transparent 34%),
+                radial-gradient(ellipse at 75% 45%,rgba(217,70,239,.24),transparent 38%),
+                radial-gradient(ellipse at 50% 80%,rgba(168,85,247,.20),transparent 40%);
+            filter: blur(55px);
+            animation: auroraMove 18s ease-in-out infinite alternate;
+        }
+
+        .background-effects::after {
+            display: none;
+        }
+
+        @keyframes auroraMove {
+            from { transform: translate(-5%,-3%) rotate(-5deg) scale(1); }
+            to { transform: translate(6%,5%) rotate(6deg) scale(1.08); }
+        }
+
+        .bubble,
+        .light-line {
+            display: none;
+        }
+
+        /* MAIN LAYOUT */
+
+        .report-wrapper {
+            position: relative;
+            z-index: 2;
+            width: min(680px,100%);
+            margin: 0 auto;
+        }
+
+        .report-card {
+            position: relative;
+            overflow: hidden;
+            padding: 16px 30px 12px;
+            border: 1px solid rgba(174,83,255,.58);
+            border-radius: 22px;
+            background: rgba(27,27,49,.92);
+            box-shadow:
+                0 20px 70px rgba(0,0,0,.4),
+                0 0 40px rgba(160,32,240,.15);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            animation: cardEnter .7s ease both;
+        }
+
+        .report-card::before {
+            content: "";
+            position: absolute;
+            top: -150px;
+            right: -120px;
+            width: 260px;
+            height: 260px;
+            border: 1px solid rgba(196,100,255,.25);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        @keyframes cardEnter {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .brand,
+        .form-heading,
+        .report-form,
+        .duplicate-warning,
+        .back-link,
+        .form-footer {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* BRAND */
+
+        .brand {
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .brand-icon {
+            display: grid;
+            place-items: center;
+            width: 44px;
+            height: 44px;
+            margin: 0 auto 6px;
+            border-radius: 14px;
+            color: white;
+            background: linear-gradient(135deg,var(--purple),var(--pink));
+            box-shadow: 0 0 28px rgba(160,32,240,.48);
+            font-size: 22px;
+            font-weight: 800;
+            animation: logoGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes logoGlow {
+            50% { box-shadow: 0 0 38px rgba(210,65,255,.7); }
+        }
+
+        .brand h1 {
+            margin: 0;
+            color: white;
+            font-size: 22px;
+            letter-spacing: -.5px;
+        }
+
+        .brand h1 span {
+            color: #ca83ff;
+        }
+
+        .brand p {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .form-heading {
+            margin-bottom: 14px;
+            text-align: center;
+        }
+
+        .form-heading h2 {
+            margin: 0 0 4px;
+            color: white;
+            font-size: 21px;
+        }
+
+        .form-heading p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        /* FLASH MESSAGES */
+
+        .flash-message {
+            margin-bottom: 10px;
+            padding: 9px 12px;
+            border: 1px solid #4b9b75;
+            border-radius: 10px;
+            color: #b8f5d3;
+            background: rgba(21,59,48,.9);
+            font-size: 11px;
+            transition: opacity .5s,transform .5s;
+        }
+
+        .flash-message.error,
+        .flash-message.danger {
+            border-color: #a84b65;
+            color: #ffc0ce;
+            background: rgba(64,29,42,.9);
+        }
+
+        .flash-message.warning {
+            border-color: #b77935;
+            color: #ffdda6;
+            background: rgba(51,41,31,.9);
+        }
+
+        .flash-message.fade-out {
+            opacity: 0;
+            transform: translateY(-8px);
+            pointer-events: none;
+        }
+
+        /* FORM FIELDS */
+
+        .form-group {
+            position: relative;
+            margin-bottom: 9px;
+        }
+
+        .form-group label:not(.upload-area) {
+            display: block;
+            margin-bottom: 4px;
+            color: #e9e4f7;
+            font-size: 11px;
+            font-weight: 650;
+        }
+
+        .required {
+            color: #d28aff;
+        }
+
+        .form-control {
+            display: block;
+            width: 100%;
+            min-height: 37px;
+            padding: 7px 11px;
+            border: 1px solid #60418d;
+            border-radius: 9px;
+            outline: none;
+            color: #f7f5ff;
+            background: rgba(39,40,64,.94);
+            font-family: inherit;
+            font-size: 12px;
+            transition: border-color .25s,box-shadow .25s,background .25s;
+        }
+
+        .form-control::placeholder {
+            color: #8988a6;
+        }
+
+        .form-control:focus {
+            border-color: #c084fc;
+            background: #2c2948;
+            box-shadow:
+                0 0 0 3px rgba(160,32,240,.15),
+                0 0 18px rgba(160,32,240,.15);
+        }
+
+        select.form-control {
+            appearance: none;
+            cursor: pointer;
+            padding-right: 38px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23c084fc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 13px center;
+        }
+
+        select.form-control option {
+            color: #f7f5ff;
+            background: #23253f;
+        }
+
+        textarea.form-control {
+            min-height: 58px;
+            max-height: 90px;
+            resize: vertical;
+            line-height: 1.45;
+        }
+
+        input[type="date"].form-control {
+            color-scheme: dark;
+            cursor: pointer;
+        }
+
+        .field-hint {
+            margin: 3px 0 0;
+            color: #85839f;
+            font-size: 9px;
+            line-height: 1.4;
+        }
+
+        /* IMAGE UPLOAD */
+
+        .upload-area {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 72px;
+            padding: 8px;
+            border: 1.5px dashed #7650aa;
+            border-radius: 11px;
+            background: rgba(34,36,61,.78);
+            text-align: center;
+            cursor: pointer;
+            transition: .3s ease;
+        }
+
+        .upload-area:hover,
+        .upload-area.drag-over {
+            border-color: #d28aff;
+            background: rgba(67,39,91,.72);
+            box-shadow: 0 0 22px rgba(160,32,240,.18);
+        }
+
+        .upload-icon {
+            display: grid;
+            place-items: center;
+            width: 29px;
+            height: 29px;
+            margin-bottom: 4px;
+            border-radius: 9px;
+            color: white;
+            background: linear-gradient(135deg,var(--purple),var(--pink));
+            font-size: 17px;
+        }
+
+        .upload-area strong {
+            color: #e8ddfa;
+            font-size: 10px;
+        }
+
+        .upload-area span {
+            margin-top: 3px;
+            color: #9290ad;
+            font-size: 9px;
+        }
+
+        .upload-area input {
+            display: none;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill,minmax(58px,1fr));
+            gap: 7px;
+            margin-top: 7px;
+        }
+
+        .preview-item {
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 1;
+            border: 1px solid #684b92;
+            border-radius: 9px;
+            background: #22243d;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-name {
+            overflow: hidden;
+            margin-top: 3px;
+            color: #aaa8c4;
+            font-size: 9px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* DUPLICATE WARNING */
+
+        .duplicate-warning {
+            display: none;
+            margin-bottom: 12px;
+            padding: 13px;
+            border: 1px solid #b77935;
+            border-radius: 12px;
+            background: rgba(51,41,31,.95);
+            animation: cardEnter .4s ease both;
+        }
+
+        .duplicate-warning h3 {
+            margin: 0 0 6px;
+            color: #ffd18b;
+            font-size: 14px;
+        }
+
+        .duplicate-warning > p {
+            margin: 0 0 10px;
+            color: #e3c9a7;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        .duplicate-list {
+            display: grid;
+            gap: 7px;
+            margin-bottom: 10px;
+        }
+
+        .duplicate-item {
+            padding: 9px;
+            border: 1px solid #725437;
+            border-radius: 9px;
+            background: rgba(41,37,31,.9);
+        }
+
+        .duplicate-item h4 {
+            margin: 0 0 5px;
+            color: #ffe1b5;
+            font-size: 12px;
+        }
+
+        .duplicate-item p {
+            margin: 3px 0;
+            color: #cbb99f;
+            font-size: 9px;
+            line-height: 1.4;
+        }
+
+        .similarity {
+            display: inline-block;
+            margin-top: 5px;
+            padding: 3px 7px;
+            border-radius: 20px;
+            color: #ffdda6;
+            background: #62421e;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .duplicate-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        .duplicate-button {
+            flex: 1;
+            min-height: 34px;
+            padding: 7px 10px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .edit-button {
+            border-color: #79628e;
+            color: #e9d9ff;
+            background: #383047;
+        }
+
+        .continue-button {
+            color: #24180a;
+            background: linear-gradient(105deg,#f6c36b,#e9a33c);
+        }
+
+        .duplicate-button:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        /* SUBMIT BUTTON */
+
+        .submit-button {
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            min-height: 40px;
+            margin-top: 10px;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 10px;
+            color: white;
+            background: linear-gradient(105deg,#a020f0,#e04de8);
+            box-shadow: 0 7px 22px rgba(116,55,237,.35);
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 750;
+            cursor: pointer;
+            transition: .25s ease;
+        }
+
+        .submit-button::before {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            top: -80%;
+            left: -65%;
+            width: 45%;
+            height: 260%;
+            background: linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);
+            transform: rotate(25deg);
+            animation: buttonShine 4s ease-in-out infinite;
+        }
+
+        @keyframes buttonShine {
+            0% { left: -65%; }
+            55%,100% { left: 135%; }
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(116,55,237,.5);
+            filter: brightness(1.1);
+        }
+
+        .submit-button:active {
+            transform: scale(.98);
+        }
+
+        .submit-button:disabled {
+            opacity: .65;
+            cursor: wait;
+            transform: none;
+        }
+
+        .back-link {
+            display: block;
+            width: fit-content;
+            margin: 9px auto 0;
+            color: #c084fc;
+            font-size: 10px;
+            font-weight: 650;
+            text-decoration: none;
+            transition: .2s ease;
+        }
+
+        .back-link:hover {
+            color: #e4c3ff;
+            text-shadow: 0 0 12px rgba(192,132,252,.6);
+        }
+
+        .form-footer {
+            margin-top: 8px;
+            color: #777792;
+            text-align: center;
+            font-size: 9px;
+        }
+
+        /* CUSTOM CURSOR */
+
+        .cursor-glow,
+        .custom-cursor,
+        .cursor-trail {
+            position: fixed;
+            z-index: 10;
+            pointer-events: none;
+            border-radius: 50%;
+        }
+
+        .cursor-glow {
+            width: 140px;
+            height: 140px;
+            background: radial-gradient(circle,rgba(168,63,255,.10),transparent 70%);
+            transform: translate(-50%,-50%);
+        }
+
+        .custom-cursor {
+            width: 7px;
+            height: 7px;
+            background: white;
+            box-shadow: 0 0 8px white,0 0 18px #c45cff;
+            transform: translate(-50%,-50%);
+        }
+
+        .cursor-trail {
+            width: 20px;
+            height: 20px;
+            border: 1px solid rgba(190,120,255,.8);
+            transform: translate(-50%,-50%);
+            transition: width .2s,height .2s;
+        }
+
+        @media (pointer: coarse) {
+            .cursor-glow,
+            .custom-cursor,
+            .cursor-trail {
+                display: none !important;
+            }
+        }
+
+        :focus-visible {
+            outline: 2px solid #d28aff;
+            outline-offset: 3px;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+
+            .report-card {
+                padding: 20px 16px;
+                border-radius: 18px;
+            }
+
+            .brand h1 {
+                font-size: 21px;
+            }
+
+            .form-heading h2 {
+                font-size: 19px;
+            }
+
+            .duplicate-actions {
+                flex-direction: column;
+            }
+
+            textarea.form-control {
+                min-height: 85px;
+            }
+
+            .upload-area {
+                min-height: 90px;
+            }
+        }
+
+        /* SHORT DESKTOP VIEWPORT */
+
+        @media (max-height: 760px) and (min-width: 601px) {
+            body {
+                padding-top: 5px;
+                padding-bottom: 5px;
+            }
+
+            .report-card {
+                padding-top: 9px;
+                padding-bottom: 8px;
+            }
+
+            .brand {
+                margin-bottom: 6px;
+            }
+
+            .form-heading {
+                margin-bottom: 8px;
+            }
+
+            .form-group {
+                margin-bottom: 6px;
+            }
+
+            textarea.form-control {
+                min-height: 48px;
+                max-height: 60px;
+            }
+
+            .upload-area {
+                min-height: 58px;
+            }
+
+            .submit-button {
+                min-height: 35px;
+                margin-top: 6px;
+            }
+
+            .back-link {
+                margin-top: 6px;
+            }
+
+            .form-footer {
+                margin-top: 5px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ANIMATED BACKGROUND -->
+
+    <canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+    <div class="background-effects" aria-hidden="true">
+        <span class="bubble bubble-one"></span>
+        <span class="bubble bubble-two"></span>
+        <span class="bubble bubble-three"></span>
+        <span class="bubble bubble-four"></span>
+        <span class="bubble bubble-five"></span>
+        <div class="light-line line-one"></div>
+        <div class="light-line line-two"></div>
+    </div>
+
+    <!-- CUSTOM CURSOR -->
+
+    <div class="cursor-glow"></div>
+    <div class="custom-cursor"></div>
+    <div class="cursor-trail"></div>
+
+    <main class="report-wrapper">
+        <div class="report-card">
+
+            <!-- FLASH MESSAGES -->
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endwith %}
+
+            <!-- BRAND -->
+
+            <header class="brand">
+                <div class="brand-icon">C</div>
+                <h1>CEC <span>Lost &amp; Found</span></h1>
+                <p>Campus Lost &amp; Found Portal</p>
+            </header>
+
+            <div class="form-heading">
+                <h2>Report an Item</h2>
+                <p>Help the campus community find or recover belongings.</p>
+            </div>
+
+            <!-- DUPLICATE WARNING -->
+
+            <section
+                class="duplicate-warning"
+                id="duplicateWarning"
+                aria-live="polite"
+                {% if duplicate_matches %}
+                    style="display:block;"
+                {% endif %}
+            >
+                <h3>⚠ Possible Duplicate Reports Found</h3>
+
+                <p>
+                    We found existing reports that may describe the same item.
+                    Please review them before submitting another report.
+                    This is a similarity check, not confirmation that the
+                    reports refer to the same physical item.
+                </p>
+
+                <div class="duplicate-list" id="duplicateList">
+                    {% for match in duplicate_matches or [] %}
+                        <article class="duplicate-item">
+                            <h4>{{ match.item_name }}</h4>
+                            <p><strong>Category:</strong> {{ match.category }}</p>
+                            <p><strong>Location:</strong> {{ match.location }}</p>
+                            <p><strong>Date:</strong> {{ match.report_date }}</p>
+                            <p><strong>Status:</strong> {{ match.status }}</p>
+                            <span class="similarity">
+                                {{ match.score }}% similarity
+                            </span>
+                        </article>
+                    {% endfor %}
+                </div>
+
+                <div class="duplicate-actions">
+                    <button
+                        type="button"
+                        class="duplicate-button edit-button"
+                        id="editReportButton"
+                    >
+                        Review My Details
+                    </button>
+
+                    <button
+                        type="button"
+                        class="duplicate-button continue-button"
+                        id="continueReportButton"
+                    >
+                        Continue Anyway
+                    </button>
+                </div>
+            </section>
+
+            <!-- REPORT FORM -->
+
+            <form
+                method="POST"
+                action="{{ url_for('report_item') }}"
+                enctype="multipart/form-data"
+                id="reportForm"
+            >
+
+                <!-- CSRF TOKEN -->
+
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    id="csrfToken"
+                    value="{{ csrf_token() }}"
+                >
+
+                <!-- DUPLICATE CONFIRMATION -->
+
+                <input
+                    type="hidden"
+                    name="confirm_duplicates"
+                    id="confirmDuplicates"
+                    value="no"
+                >
+
+                <!-- REPORT TYPE -->
+
+                <div class="form-group">
+                    <label for="report_type">
+                        Report Type <span class="required">*</span>
+                    </label>
+
+                    <select
+                        class="form-control"
+                        id="report_type"
+                        name="report_type"
+                        required
+                    >
+                        <option value="">Select report type</option>
+
+                        <option
+                            value="lost"
+                            {% if (form_data.get('report_type', '') if form_data else request.args.get('report_type', '')) == 'lost' %}
+                                selected
+                            {% endif %}
+                        >
+                            I lost an item
+                        </option>
+
+                        <option
+                            value="found"
+                            {% if (form_data.get('report_type', '') if form_data else request.args.get('report_type', '')) == 'found' %}
+                                selected
+                            {% endif %}
+                        >
+                            I found an item
+                        </option>
+                    </select>
+                </div>
+
+                <!-- ITEM NAME -->
+
+                <div class="form-group">
+                    <label for="item_name">
+                        Item Name <span class="required">*</span>
+                    </label>
+
+                    <input
+                        class="form-control"
+                        type="text"
+                        id="item_name"
+                        name="item_name"
+                        placeholder="e.g. Black wallet, ID card, keys"
+                        maxlength="120"
+                        value="{{ form_data.get('item_name', '') if form_data else '' }}"
+                        required
+                    >
+                </div>
+
+                <!-- CATEGORY -->
+
+                <div class="form-group">
+                    <label for="category">
+                        Category <span class="required">*</span>
+                    </label>
+
+                    <select
+                        class="form-control"
+                        id="category"
+                        name="category"
+                        required
+                    >
+                        <option value="">Select a category</option>
+
+                        {% set selected_category = form_data.get('category', '') if form_data else '' %}
+
+                        {% for category_option in [
+                            'Electronics',
+                            'ID Cards',
+                            'Bags',
+                            'Books',
+                            'Clothing',
+                            'Accessories',
+                            'Keys',
+                            'Other'
+                        ] %}
+                            <option
+                                value="{{ category_option }}"
+                                {% if selected_category == category_option %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ category_option }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- DESCRIPTION -->
+
+                <div class="form-group">
+                    <label for="description">
+                        Description <span class="required">*</span>
+                    </label>
+
+                    <textarea
+                        class="form-control"
+                        id="description"
+                        name="description"
+                        placeholder="Describe the item, including identifying details such as colour, brand, size or unique features..."
+                        required
+                    >{{ form_data.get('description', '') if form_data else '' }}</textarea>
+
+                    <p class="field-hint">
+                        Include useful details that can help identify the item.
+                    </p>
+                </div>
+
+                <!-- LOCATION -->
+
+                <div class="form-group">
+                    <label for="location">
+                        Location <span class="required">*</span>
+                    </label>
+
+                    <input
+                        class="form-control"
+                        type="text"
+                        id="location"
+                        name="location"
+                        placeholder="e.g. College Library, Canteen, Block A"
+                        maxlength="150"
+                        value="{{ form_data.get('location', '') if form_data else '' }}"
+                        required
+                    >
+                </div>
+
+                <!-- DATE -->
+
+                <div class="form-group">
+                    <label for="report_date">
+                        Date Lost / Found <span class="required">*</span>
+                    </label>
+
+                    <input
+                        class="form-control"
+                        type="date"
+                        id="report_date"
+                        name="report_date"
+                        value="{{ form_data.get('report_date', '') if form_data else '' }}"
+                        required
+                    >
+
+                    <p class="field-hint">
+                        Select the date when the item was lost or found.
+                    </p>
+                </div>
+
+                <!-- IMAGE UPLOAD -->
+
+                <div class="form-group">
+                    <label for="images">Upload Item Images</label>
+
+                    <label
+                        class="upload-area"
+                        for="images"
+                        id="uploadArea"
+                    >
+                        <div class="upload-icon">↑</div>
+
+                        <strong>
+                            Click to upload or drag images here
+                        </strong>
+
+                        <span>
+                            PNG, JPG, JPEG or WEBP · Maximum 5 images
+                        </span>
+
+                        <input
+                            type="file"
+                            id="images"
+                            name="images"
+                            accept=".png,.jpg,.jpeg,.webp"
+                            multiple
+                        >
+                    </label>
+
+                    <p class="field-hint">
+                        Images are optional but can help identify the item.
+                    </p>
+
+                    <div class="preview-grid" id="previewGrid"></div>
+                </div>
+
+                <!-- SUBMIT -->
+
+                <button
+                    class="submit-button"
+                    type="submit"
+                    id="submitButton"
+                >
+                    Submit Report <span>→</span>
+                </button>
+
+            </form>
+
+            <a
+                class="back-link"
+                href="{{ url_for('student_dashboard') }}"
+            >
+                ← Back to Dashboard
+            </a>
+
+            <footer class="form-footer">
+                CEC Lost &amp; Found · Secure Student Access
+            </footer>
+
+        </div>
+    </main>
+
+    <!-- PARTICLE NETWORK ANIMATION -->
+
+    <script>
+        (() => {
+            const canvas = document.getElementById("particle-canvas");
+            const ctx = canvas.getContext("2d");
+
+            if (!ctx) return;
+
+            const reducedMotion = window.matchMedia(
+                "(prefers-reduced-motion: reduce)"
+            ).matches;
+
+            const mouse = {
+                x: null,
+                y: null,
+                radius: 165
+            };
+
+            let particles = [];
+            let width = 0;
+            let height = 0;
+            let animationFrame = null;
+
+            const isMobile = window.matchMedia(
+                "(max-width: 700px)"
+            ).matches;
+
+            const particleCount = isMobile ? 65 : 125;
+
+            function resizeCanvas() {
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+                width = window.innerWidth;
+                height = window.innerHeight;
+
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+
+                canvas.style.width = width + "px";
+                canvas.style.height = height + "px";
+
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+                createParticles();
+                drawParticles();
+            }
+
+            function createParticles() {
+                particles = [];
+
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - .5) * .55,
+                        vy: (Math.random() - .5) * .55,
+                        radius: Math.random() * 2 + 1,
+                        pulse: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+
+            function drawParticles() {
+                ctx.clearRect(0, 0, width, height);
+
+                particles.forEach((p) => {
+                    p.pulse += .025;
+
+                    if (!reducedMotion) {
+                        p.x += p.vx;
+                        p.y += p.vy;
+
+                        if (p.x < 0 || p.x > width) p.vx *= -1;
+                        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                        p.x = Math.max(0, Math.min(width, p.x));
+                        p.y = Math.max(0, Math.min(height, p.y));
+
+                        if (mouse.x !== null && mouse.y !== null) {
+                            const dx = p.x - mouse.x;
+                            const dy = p.y - mouse.y;
+                            const distance = Math.hypot(dx, dy);
+
+                            if (distance < mouse.radius && distance > 0) {
+                                const force =
+                                    (mouse.radius - distance) / mouse.radius;
+
+                                p.x += (dx / distance) * force * 1.8;
+                                p.y += (dy / distance) * force * 1.8;
+                            }
+                        }
+                    }
+
+                    const glow = .65 + Math.sin(p.pulse) * .25;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(236,105,210,${glow})`;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = "#ec48b5";
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                });
+
+                /* CONNECT NEARBY PARTICLES */
+
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const p1 = particles[i];
+                        const p2 = particles[j];
+
+                        const dx = p1.x - p2.x;
+                        const dy = p1.y - p2.y;
+                        const distance = Math.hypot(dx, dy);
+
+                        if (distance < 145) {
+                            const opacity = (1 - distance / 145) * .25;
+
+                            ctx.beginPath();
+                            ctx.moveTo(p1.x, p1.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            ctx.strokeStyle =
+                                `rgba(207,83,220,${opacity})`;
+                            ctx.lineWidth = .8;
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                /* CONNECT PARTICLES TO CURSOR */
+
+                if (mouse.x !== null && mouse.y !== null) {
+                    particles.forEach((p) => {
+                        const dx = p.x - mouse.x;
+                        const dy = p.y - mouse.y;
+                        const distance = Math.hypot(dx, dy);
+
+                        if (distance < mouse.radius) {
+                            ctx.beginPath();
+                            ctx.moveTo(p.x, p.y);
+                            ctx.lineTo(mouse.x, mouse.y);
+
+                            ctx.strokeStyle =
+                                `rgba(236,114,210,${
+                                    (1 - distance / mouse.radius) * .45
+                                })`;
+
+                            ctx.lineWidth = 1;
+                            ctx.stroke();
+                        }
+                    });
+                }
+
+                if (!reducedMotion) {
+                    animationFrame = requestAnimationFrame(drawParticles);
+                }
+            }
+
+            window.addEventListener("mousemove", (event) => {
+                mouse.x = event.clientX;
+                mouse.y = event.clientY;
+            });
+
+            window.addEventListener("mouseout", (event) => {
+                if (!event.relatedTarget) {
+                    mouse.x = null;
+                    mouse.y = null;
+                }
+            });
+
+            window.addEventListener("resize", () => {
+                if (animationFrame !== null) {
+                    cancelAnimationFrame(animationFrame);
+                }
+
+                resizeCanvas();
+            });
+
+            resizeCanvas();
+        })();
+    </script>
+
+    <!-- CUSTOM CURSOR -->
+
+    <script>
+        (() => {
+            const glow = document.querySelector(".cursor-glow");
+            const cursor = document.querySelector(".custom-cursor");
+            const trail = document.querySelector(".cursor-trail");
+
+            if (!glow || !cursor || !trail) return;
+            if (window.matchMedia("(pointer: coarse)").matches) return;
+
+            let mouseX = 0;
+            let mouseY = 0;
+            let trailX = 0;
+            let trailY = 0;
+
+            document.addEventListener("mousemove", (event) => {
+                mouseX = event.clientX;
+                mouseY = event.clientY;
+
+                cursor.style.left = mouseX + "px";
+                cursor.style.top = mouseY + "px";
+
+                glow.style.left = mouseX + "px";
+                glow.style.top = mouseY + "px";
+            });
+
+            function animateTrail() {
+                trailX += (mouseX - trailX) * .13;
+                trailY += (mouseY - trailY) * .13;
+
+                trail.style.left = trailX + "px";
+                trail.style.top = trailY + "px";
+
+                requestAnimationFrame(animateTrail);
+            }
+
+            animateTrail();
+
+            document.querySelectorAll(
+                "button,a,input,select,textarea"
+            ).forEach((element) => {
+                element.addEventListener("mouseenter", () => {
+                    trail.style.width = "38px";
+                    trail.style.height = "38px";
+                });
+
+                element.addEventListener("mouseleave", () => {
+                    trail.style.width = "24px";
+                    trail.style.height = "24px";
+                });
+            });
+        })();
+    </script>
+
+    <!-- IMAGE PREVIEW AND DRAG/DROP -->
+
+    <script>
+        const imageInput = document.getElementById("images");
+        const previewGrid = document.getElementById("previewGrid");
+        const uploadArea = document.getElementById("uploadArea");
+
+        imageInput.addEventListener("change", function () {
+            previewImages(this.files);
+        });
+
+        function previewImages(files) {
+            previewGrid.innerHTML = "";
+
+            if (files.length > 5) {
+                alert("You can upload a maximum of 5 images.");
+                imageInput.value = "";
+                return;
+            }
+
+            const allowedTypes = [
+                "image/png",
+                "image/jpeg",
+                "image/webp"
+            ];
+
+            for (const file of files) {
+                if (!allowedTypes.includes(file.type)) {
+                    alert(
+                        "Please select only PNG, JPG, JPEG or WEBP images."
+                    );
+
+                    imageInput.value = "";
+                    previewGrid.innerHTML = "";
+                    return;
+                }
+            }
+
+            for (const file of files) {
+                const reader = new FileReader();
+
+                reader.onload = function (event) {
+                    const container = document.createElement("div");
+                    const item = document.createElement("div");
+                    const image = document.createElement("img");
+                    const name = document.createElement("div");
+
+                    image.src = event.target.result;
+                    image.alt = "Selected item image preview";
+
+                    name.className = "preview-name";
+                    name.textContent = file.name;
+
+                    item.className = "preview-item";
+                    item.appendChild(image);
+
+                    container.appendChild(item);
+                    container.appendChild(name);
+
+                    previewGrid.appendChild(container);
+                };
+
+                reader.readAsDataURL(file);
+            }
+        }
+
+        uploadArea.addEventListener("dragover", function (event) {
+            event.preventDefault();
+            uploadArea.classList.add("drag-over");
+        });
+
+        uploadArea.addEventListener("dragleave", function () {
+            uploadArea.classList.remove("drag-over");
+        });
+
+        uploadArea.addEventListener("drop", function (event) {
+            event.preventDefault();
+            uploadArea.classList.remove("drag-over");
+
+            const files = event.dataTransfer.files;
+
+            if (files.length > 5) {
+                alert("You can upload a maximum of 5 images.");
+                return;
+            }
+
+            const dataTransfer = new DataTransfer();
+
+            for (const file of files) {
+                dataTransfer.items.add(file);
+            }
+
+            imageInput.files = dataTransfer.files;
+            previewImages(imageInput.files);
+        });
+    </script>
+
+    <!-- DUPLICATE DETECTION -->
+
+    <script>
+        const reportForm = document.getElementById("reportForm");
+
+        const duplicateWarning =
+            document.getElementById("duplicateWarning");
+
+        const duplicateList =
+            document.getElementById("duplicateList");
+
+        const confirmDuplicates =
+            document.getElementById("confirmDuplicates");
+
+        const submitButton =
+            document.getElementById("submitButton");
+
+        const editReportButton =
+            document.getElementById("editReportButton");
+
+        const continueReportButton =
+            document.getElementById("continueReportButton");
+
+        let allowSubmission = false;
+        let checkingDuplicates = false;
+
+        function showDuplicateMatches(matches) {
+            duplicateList.replaceChildren();
+
+            matches.forEach(function (match) {
+                const card = document.createElement("article");
+                card.className = "duplicate-item";
+
+                const title = document.createElement("h4");
+                title.textContent = match.item_name;
+
+                const category = document.createElement("p");
+                category.textContent = "Category: " + match.category;
+
+                const location = document.createElement("p");
+                location.textContent = "Location: " + match.location;
+
+                const date = document.createElement("p");
+                date.textContent = "Date: " + match.report_date;
+
+                const status = document.createElement("p");
+                status.textContent = "Status: " + match.status;
+
+                const score = document.createElement("span");
+                score.className = "similarity";
+                score.textContent = match.score + "% similarity";
+
+                card.appendChild(title);
+                card.appendChild(category);
+                card.appendChild(location);
+                card.appendChild(date);
+                card.appendChild(status);
+                card.appendChild(score);
+
+                duplicateList.appendChild(card);
+            });
+
+            duplicateWarning.style.display = "block";
+
+            duplicateWarning.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+        }
+
+        reportForm.addEventListener("submit", async function (event) {
+            if (allowSubmission) {
+                return;
+            }
+
+            event.preventDefault();
+
+            if (
+                !reportForm.report_type.value ||
+                !reportForm.item_name.value.trim() ||
+                !reportForm.category.value ||
+                !reportForm.description.value.trim() ||
+                !reportForm.location.value.trim() ||
+                !reportForm.report_date.value
+            ) {
+                const firstInvalid =
+                    reportForm.querySelector(":invalid");
+
+                if (firstInvalid) {
+                    firstInvalid.focus();
+                    firstInvalid.reportValidity();
+                }
+
+                return;
+            }
+
+            if (checkingDuplicates) {
+                return;
+            }
+
+            checkingDuplicates = true;
+            submitButton.disabled = true;
+            submitButton.textContent = "Checking for duplicates...";
+
+            const reportData = {
+                report_type: reportForm.report_type.value,
+                item_name: reportForm.item_name.value.trim(),
+                category: reportForm.category.value,
+                description: reportForm.description.value.trim(),
+                location: reportForm.location.value.trim()
+            };
+
+            try {
+                const response = await fetch(
+                    "{{ url_for('api_check_duplicate') }}",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken":
+                                document.getElementById("csrfToken").value
+                        },
+                        body: JSON.stringify(reportData)
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(
+                        "Duplicate check could not be completed."
+                    );
+                }
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(
+                        result.message || "Duplicate check failed."
+                    );
+                }
+
+                if (
+                    result.has_duplicates &&
+                    result.matches &&
+                    result.matches.length > 0
+                ) {
+                    showDuplicateMatches(result.matches);
+
+                    submitButton.disabled = false;
+                    submitButton.innerHTML =
+                        'Submit Report <span>→</span>';
+
+                    checkingDuplicates = false;
+                    return;
+                }
+
+                allowSubmission = true;
+                submitButton.disabled = false;
+                reportForm.requestSubmit();
+
+            } catch (error) {
+                console.error("Duplicate check error:", error);
+
+                /*
+                 * The server-side route must perform its own
+                 * duplicate check before saving the report.
+                 */
+
+                allowSubmission = true;
+                submitButton.disabled = false;
+                reportForm.requestSubmit();
+            }
+        });
+
+        editReportButton.addEventListener("click", function () {
+            duplicateWarning.style.display = "none";
+
+            document.getElementById("item_name").focus();
+
+            window.scrollTo({
+                top: reportForm.offsetTop,
+                behavior: "smooth"
+            });
+        });
+
+        continueReportButton.addEventListener("click", function () {
+            confirmDuplicates.value = "yes";
+            allowSubmission = true;
+            reportForm.requestSubmit();
+        });
+    </script>
+
+    <!-- AUTO-DISMISS FLASH MESSAGES -->
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const messages =
+                document.querySelectorAll(".flash-message");
+
+            messages.forEach(function (message) {
+                setTimeout(function () {
+                    message.classList.add("fade-out");
+
+                    setTimeout(function () {
+                        message.remove();
+                    }, 500);
+                }, 4000);
+            });
+        });
+    </script>
+
+    <!-- EXISTING CURSOR SCRIPT -->
+
+    <script src="{{ url_for('static', filename='js/cursor.js') }}"></script>
+
+</body>
+</html>

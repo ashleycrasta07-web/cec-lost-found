@@ -1,0 +1,1293 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CEC | Resolution Requests</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0b0d20;
+            --surface: rgba(25, 27, 54, 0.78);
+            --surface-light: rgba(36, 37, 72, 0.72);
+            --border: rgba(151, 119, 255, 0.20);
+            --purple: #a855f7;
+            --blue: #398bff;
+            --text: #f5f3ff;
+            --muted: #a5a4c5;
+            --green: #39d6a3;
+            --red: #ff718f;
+            --gold: #f6c76b;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text);
+            background:
+                radial-gradient(ellipse at 12% 10%, rgba(105, 47, 190, .17), transparent 36%),
+                radial-gradient(ellipse at 90% 85%, rgba(31, 105, 210, .13), transparent 35%),
+                var(--bg);
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        button, a {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Background */
+
+        #networkCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: .55;
+        }
+
+        .ambient-orb {
+            position: fixed;
+            z-index: 0;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: .13;
+            pointer-events: none;
+            animation: orbFloat 12s ease-in-out infinite alternate;
+        }
+
+        .orb-one {
+            top: 5%;
+            left: -130px;
+            background: #a020f0;
+        }
+
+        .orb-two {
+            right: -130px;
+            bottom: 5%;
+            background: #168cff;
+            animation-delay: -5s;
+        }
+
+        @keyframes orbFloat {
+            from {
+                transform: translate3d(0, 0, 0);
+            }
+
+            to {
+                transform: translate3d(45px, 35px, 0);
+            }
+        }
+
+        /* Main layout */
+
+        .page-container {
+            position: relative;
+            z-index: 2;
+            width: min(1250px, 92%);
+            margin: auto;
+            padding: 30px 0 45px;
+        }
+
+        /* Header */
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            padding: 15px 19px;
+            margin-bottom: 38px;
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            background: rgba(20, 21, 44, .72);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, .18);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .brand-icon {
+            display: grid;
+            place-items: center;
+            width: 45px;
+            height: 45px;
+            flex-shrink: 0;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #a020f0, #168cff);
+            font-size: 22px;
+            font-weight: 850;
+            box-shadow: 0 0 24px rgba(145, 65, 255, .35);
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 18px;
+            letter-spacing: .2px;
+        }
+
+        .brand h1 span {
+            color: #c084fc;
+        }
+
+        .brand p {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 11px;
+            letter-spacing: .5px;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 16px;
+            border: 1px solid rgba(160, 105, 255, .38);
+            border-radius: 11px;
+            color: #e9d8ff;
+            background: rgba(107, 52, 160, .15);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 650;
+            transition: .25s ease;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            border-color: #c084fc;
+            background: rgba(142, 75, 210, .25);
+            box-shadow: 0 0 20px rgba(160, 32, 240, .2);
+        }
+
+        /* Page heading */
+
+        .heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 27px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            color: #c49aff;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .eyebrow-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #b56aff;
+            box-shadow: 0 0 12px #b56aff;
+        }
+
+        .heading h2 {
+            margin: 0 0 10px;
+            font-size: clamp(27px, 4vw, 38px);
+            letter-spacing: -.8px;
+        }
+
+        .heading h2 span {
+            color: #c084fc;
+            background: linear-gradient(90deg, #d18aff, #70aaff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .heading p {
+            max-width: 650px;
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        /* Summary */
+
+        .summary-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            min-width: 190px;
+            padding: 16px 20px;
+            border: 1px solid rgba(246, 199, 107, .22);
+            border-radius: 15px;
+            background: linear-gradient(
+                135deg,
+                rgba(93, 67, 37, .22),
+                rgba(35, 32, 57, .75)
+            );
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .12);
+        }
+
+        .summary-icon {
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            color: var(--gold);
+            background: rgba(246, 199, 107, .12);
+            font-size: 20px;
+        }
+
+        .summary-number {
+            display: block;
+            color: #fff1cf;
+            font-size: 23px;
+            font-weight: 800;
+        }
+
+        .summary-label {
+            display: block;
+            margin-top: 3px;
+            color: #b9a98c;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Section heading */
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin: 29px 0 17px;
+        }
+
+        .section-heading h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 750;
+        }
+
+        .section-count {
+            padding: 6px 10px;
+            border: 1px solid rgba(168, 85, 247, .25);
+            border-radius: 8px;
+            color: #d8b5ff;
+            background: rgba(168, 85, 247, .10);
+            font-size: 10px;
+            font-weight: 750;
+        }
+
+        /* Request cards */
+
+        .request-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .request-card {
+            position: relative;
+            padding: 23px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            border-radius: 19px;
+            background: linear-gradient(
+                145deg,
+                rgba(31, 30, 64, .88),
+                rgba(18, 21, 44, .92)
+            );
+            backdrop-filter: blur(16px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, .17);
+            transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
+            animation: cardEnter .5s ease both;
+        }
+
+        .request-card::before {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #bd70ff, #428fff);
+            content: "";
+            opacity: .9;
+        }
+
+        .request-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(175, 113, 255, .5);
+            box-shadow: 0 18px 42px rgba(94, 44, 173, .17);
+        }
+
+        @keyframes cardEnter {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .request-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 21px;
+        }
+
+        .item-heading {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .item-icon {
+            display: grid;
+            place-items: center;
+            width: 47px;
+            height: 47px;
+            flex-shrink: 0;
+            border: 1px solid rgba(168, 85, 247, .25);
+            border-radius: 13px;
+            color: #d6a9ff;
+            background: rgba(168, 85, 247, .12);
+            font-size: 21px;
+        }
+
+        .item-heading h3 {
+            margin: 0 0 7px;
+            font-size: 18px;
+            font-weight: 750;
+            overflow-wrap: anywhere;
+        }
+
+        .request-id {
+            color: #a9a4c8;
+            font-size: 11px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 12px;
+            border: 1px solid rgba(246, 199, 107, .25);
+            border-radius: 9px;
+            color: #ffdc96;
+            background: rgba(246, 199, 107, .10);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 9px var(--gold);
+        }
+
+        /* Student information */
+
+        .student-strip {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 15px;
+            margin-bottom: 17px;
+            border: 1px solid rgba(119, 124, 190, .13);
+            border-radius: 12px;
+            background: rgba(12, 15, 34, .42);
+        }
+
+        .student-avatar {
+            display: grid;
+            place-items: center;
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            color: white;
+            background: linear-gradient(135deg, #9333ea, #2563eb);
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .student-info {
+            min-width: 0;
+        }
+
+        .student-info strong {
+            display: block;
+            color: #eeeaff;
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .student-info span {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .request-date {
+            margin-left: auto;
+            color: #aaa8c4;
+            font-size: 10px;
+            text-align: right;
+        }
+
+        /* Item details */
+
+        .details-heading {
+            margin: 0 0 12px;
+            color: #d4c3f4;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.1px;
+            text-transform: uppercase;
+        }
+
+        .request-details {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 11px;
+            padding: 16px;
+            border: 1px solid rgba(119, 124, 190, .14);
+            border-radius: 13px;
+            background: rgba(12, 15, 34, .38);
+        }
+
+        .detail-box {
+            min-width: 0;
+            padding: 8px 9px;
+        }
+
+        .detail-label {
+            display: block;
+            margin-bottom: 6px;
+            color: #8584a8;
+            font-size: 9px;
+            font-weight: 750;
+            letter-spacing: .9px;
+            text-transform: uppercase;
+        }
+
+        .detail-value {
+            display: block;
+            color: #e3def4;
+            font-size: 12px;
+            line-height: 1.65;
+            overflow-wrap: anywhere;
+        }
+
+        .description-box {
+            grid-column: 1 / -1;
+            padding-top: 12px;
+            border-top: 1px solid rgba(119, 124, 190, .13);
+        }
+
+        /* Student explanation */
+
+        .request-message {
+            position: relative;
+            padding: 17px 18px;
+            margin-top: 17px;
+            border: 1px solid rgba(168, 85, 247, .19);
+            border-left: 3px solid #a855f7;
+            border-radius: 12px;
+            background: linear-gradient(
+                110deg,
+                rgba(117, 55, 175, .13),
+                rgba(35, 48, 91, .15)
+            );
+        }
+
+        .message-title {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 10px;
+            color: #d9b9ff;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+        }
+
+        .message-title span {
+            font-size: 15px;
+        }
+
+        .message-text {
+            margin: 0;
+            color: #ddd7ef;
+            font-size: 12px;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+            white-space: pre-line;
+        }
+
+        /* Actions */
+
+        .request-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding-top: 19px;
+            margin-top: 19px;
+            border-top: 1px solid rgba(119, 124, 190, .15);
+        }
+
+        .review-hint {
+            color: #9291b1;
+            font-size: 10px;
+            line-height: 1.6;
+        }
+
+        .request-actions {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            flex-wrap: wrap;
+        }
+
+        .action-form {
+            margin: 0;
+        }
+
+        .action-button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            min-width: 145px;
+            min-height: 43px;
+            padding: 11px 17px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: .25s ease;
+        }
+
+        .approve-button {
+            border: 1px solid rgba(57, 214, 163, .4);
+            color: #a9f5d9;
+            background: linear-gradient(
+                135deg,
+                rgba(24, 111, 82, .36),
+                rgba(21, 72, 65, .55)
+            );
+        }
+
+        .approve-button:hover {
+            transform: translateY(-2px);
+            border-color: var(--green);
+            background: rgba(28, 132, 96, .4);
+            box-shadow: 0 0 20px rgba(57, 214, 163, .15);
+        }
+
+        .reject-button {
+            border: 1px solid rgba(255, 113, 143, .35);
+            color: #ffc0cf;
+            background: linear-gradient(
+                135deg,
+                rgba(128, 39, 69, .3),
+                rgba(91, 34, 58, .48)
+            );
+        }
+
+        .reject-button:hover {
+            transform: translateY(-2px);
+            border-color: var(--red);
+            background: rgba(155, 46, 78, .4);
+            box-shadow: 0 0 20px rgba(255, 113, 143, .14);
+        }
+
+        .action-button:focus-visible,
+        .back-button:focus-visible {
+            outline: 2px solid #c084fc;
+            outline-offset: 4px;
+        }
+
+        /* Empty states */
+
+        .empty-state {
+            padding: 65px 20px;
+            border: 1px dashed rgba(157, 111, 230, .4);
+            border-radius: 19px;
+            background: rgba(26, 27, 55, .65);
+            text-align: center;
+            backdrop-filter: blur(12px);
+        }
+
+        .empty-icon {
+            display: grid;
+            place-items: center;
+            width: 66px;
+            height: 66px;
+            margin: 0 auto 18px;
+            border: 1px solid rgba(168, 85, 247, .25);
+            border-radius: 20px;
+            color: #c084fc;
+            background: rgba(168, 85, 247, .12);
+            font-size: 27px;
+        }
+
+        .empty-state h3 {
+            margin: 0 0 10px;
+            font-size: 19px;
+        }
+
+        .empty-state p {
+            max-width: 390px;
+            margin: auto;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        /* Footer */
+
+        .page-footer {
+            padding-top: 25px;
+            margin-top: 40px;
+            border-top: 1px solid rgba(119, 124, 190, .12);
+            color: #777792;
+            text-align: center;
+            font-size: 10px;
+            letter-spacing: .5px;
+        }
+
+        /* Responsive */
+
+        @media (max-width: 700px) {
+            .page-container {
+                width: 94%;
+                padding-top: 17px;
+            }
+
+            .topbar {
+                padding: 12px;
+                margin-bottom: 29px;
+            }
+
+            .brand h1 {
+                font-size: 15px;
+            }
+
+            .brand p {
+                font-size: 10px;
+            }
+
+            .brand-icon {
+                width: 39px;
+                height: 39px;
+                font-size: 19px;
+            }
+
+            .back-button {
+                padding: 10px;
+                font-size: 10px;
+            }
+
+            .heading {
+                align-items: stretch;
+            }
+
+            .summary-card {
+                width: 100%;
+            }
+
+            .request-card {
+                padding: 17px;
+            }
+
+            .request-details {
+                grid-template-columns: 1fr;
+                gap: 7px;
+            }
+
+            .description-box {
+                grid-column: auto;
+            }
+
+            .student-strip {
+                flex-wrap: wrap;
+            }
+
+            .request-date {
+                width: 100%;
+                margin-left: 48px;
+                text-align: left;
+            }
+
+            .request-bottom {
+                align-items: stretch;
+            }
+
+            .request-actions {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .action-form,
+            .action-button {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .topbar {
+                align-items: flex-start;
+            }
+
+            .back-button {
+                max-width: 120px;
+                text-align: center;
+            }
+
+            .heading h2 {
+                font-size: 27px;
+            }
+
+            .request-top {
+                flex-direction: column;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="networkCanvas" aria-hidden="true"></canvas>
+    <div class="ambient-orb orb-one"></div>
+    <div class="ambient-orb orb-two"></div>
+
+    {% set pending_requests = resolution_requests
+        |selectattr('status', 'equalto', 'Pending')
+        |list
+    %}
+
+    <main class="page-container">
+
+        <!-- Header -->
+
+        <header class="topbar">
+
+            <div class="brand">
+                <div class="brand-icon">C</div>
+
+                <div>
+                    <h1>CEC <span>Lost & Found</span></h1>
+                    <p>ADMINISTRATOR PORTAL</p>
+                </div>
+            </div>
+
+            <a
+                class="back-button"
+                href="{{ url_for('admin_dashboard') }}"
+            >
+                <span>←</span>
+                Admin Dashboard
+            </a>
+
+        </header>
+
+        <!-- Heading -->
+
+        <section class="heading">
+
+            <div>
+                <div class="eyebrow">
+                    <span class="eyebrow-dot"></span>
+                    ADMINISTRATION / REQUEST MANAGEMENT
+                </div>
+
+                <h2>
+                    Resolution <span>Requests</span>
+                </h2>
+
+                <p>
+                    Review student requests to close lost and found reports.
+                    Verify the information before approving or rejecting a request.
+                </p>
+            </div>
+
+            <div class="summary-card">
+
+                <div class="summary-icon">◷</div>
+
+                <div>
+                    <span class="summary-number">
+                        {{ pending_requests|length }}
+                    </span>
+
+                    <span class="summary-label">
+                        Pending Requests
+                    </span>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Request list -->
+
+        <section>
+
+            <div class="section-heading">
+                <h3>Requests Awaiting Review</h3>
+
+                <span class="section-count">
+                    {{ pending_requests|length }} PENDING
+                </span>
+            </div>
+
+            {% if pending_requests %}
+
+                <div class="request-list">
+
+                    {% for resolution_request in pending_requests %}
+
+                        <article class="request-card">
+
+                            <!-- Request header -->
+
+                            <div class="request-top">
+
+                                <div class="item-heading">
+
+                                    <div class="item-icon">
+                                        ◈
+                                    </div>
+
+                                    <div>
+                                        <h3>
+                                            {{ resolution_request.item.item_name }}
+                                        </h3>
+
+                                        <div class="request-id">
+                                            REQUEST #{{ resolution_request.id }}
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <span class="status-badge">
+                                    <span class="status-dot"></span>
+                                    {{ resolution_request.status }}
+                                </span>
+
+                            </div>
+
+                            <!-- Student information -->
+
+                            <div class="student-strip">
+
+                                <div class="student-avatar">
+                                    {{ (resolution_request.user.full_name or 'S')[0]|upper }}
+                                </div>
+
+                                <div class="student-info">
+                                    <strong>
+                                        {{ resolution_request.user.full_name }}
+                                    </strong>
+
+                                    <span>
+                                        USN: {{ resolution_request.user.usn }}
+                                    </span>
+                                </div>
+
+                                <div class="request-date">
+                                    Submitted<br>
+
+                                    {{ resolution_request.created_at.strftime('%d %b %Y, %I:%M %p')
+                                        if resolution_request.created_at
+                                        else 'Date unavailable'
+                                    }}
+                                </div>
+
+                            </div>
+
+                            <!-- Item information -->
+
+                            <h4 class="details-heading">
+                                Item Information
+                            </h4>
+
+                            <div class="request-details">
+
+                                <div class="detail-box">
+                                    <span class="detail-label">
+                                        Report Type
+                                    </span>
+
+                                    <span class="detail-value">
+                                        {{ resolution_request.item.report_type|title }}
+                                    </span>
+                                </div>
+
+                                <div class="detail-box">
+                                    <span class="detail-label">
+                                        Current Item Status
+                                    </span>
+
+                                    <span class="detail-value">
+                                        {{ resolution_request.item.status }}
+                                    </span>
+                                </div>
+
+                                <div class="detail-box">
+                                    <span class="detail-label">
+                                        Category
+                                    </span>
+
+                                    <span class="detail-value">
+                                        {{ resolution_request.item.category }}
+                                    </span>
+                                </div>
+
+                                <div class="detail-box">
+                                    <span class="detail-label">
+                                        Location
+                                    </span>
+
+                                    <span class="detail-value">
+                                        {{ resolution_request.item.location }}
+                                    </span>
+                                </div>
+
+                                <div class="detail-box description-box">
+                                    <span class="detail-label">
+                                        Item Description
+                                    </span>
+
+                                    <span class="detail-value">
+                                        {{ resolution_request.item.description }}
+                                    </span>
+                                </div>
+
+                            </div>
+
+                            <!-- Student explanation -->
+
+                            <div class="request-message">
+
+                                <div class="message-title">
+                                    <span>✦</span>
+                                    Student's Explanation
+                                </div>
+
+                                <p class="message-text">
+                                    {{ resolution_request.message }}
+                                </p>
+
+                            </div>
+
+                            <!-- Admin actions -->
+
+                            <div class="request-bottom">
+
+                                <div class="review-hint">
+                                    Review the student's explanation before<br>
+                                    taking action on this request.
+                                </div>
+
+                                <div class="request-actions">
+
+                                    <form
+                                        class="action-form"
+                                        method="POST"
+                                        action="{{ url_for(
+                                            'approve_resolution_request',
+                                            request_id=resolution_request.id
+                                        ) }}"
+                                        onsubmit="return confirm(
+                                            'Approve this request and mark the item as Resolved?'
+                                        );"
+                                    >
+
+                                        <input
+                                            type="hidden"
+                                            name="csrf_token"
+                                            value="{{ csrf_token() }}"
+                                        >
+
+                                        <button
+                                            class="action-button approve-button"
+                                            type="submit"
+                                        >
+                                            <span>✓</span>
+                                            Approve Request
+                                        </button>
+
+                                    </form>
+
+                                    <form
+                                        class="action-form"
+                                        method="POST"
+                                        action="{{ url_for(
+                                            'reject_resolution_request',
+                                            request_id=resolution_request.id
+                                        ) }}"
+                                        onsubmit="return confirm(
+                                            'Are you sure you want to reject this request?'
+                                        );"
+                                    >
+
+                                        <input
+                                            type="hidden"
+                                            name="csrf_token"
+                                            value="{{ csrf_token() }}"
+                                        >
+
+                                        <button
+                                            class="action-button reject-button"
+                                            type="submit"
+                                        >
+                                            <span>✕</span>
+                                            Reject Request
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        ✓
+                    </div>
+
+                    <h3>No Pending Resolution Requests</h3>
+
+                    <p>
+                        You're all caught up. New student resolution requests
+                        will appear here when they are submitted.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+        <footer class="page-footer">
+            CEC LOST & FOUND · ADMINISTRATOR PORTAL
+        </footer>
+
+    </main>
+
+    <!-- Animated neural network background -->
+
+    <script>
+        (function () {
+            const canvas = document.getElementById("networkCanvas");
+            const ctx = canvas.getContext("2d");
+
+            if (!ctx) return;
+
+            const reducedMotion = window.matchMedia(
+                "(prefers-reduced-motion: reduce)"
+            ).matches;
+
+            let width = 0;
+            let height = 0;
+            let nodes = [];
+            let animationFrame = null;
+
+            const pointer = {
+                x: -1000,
+                y: -1000
+            };
+
+            function resizeCanvas() {
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+                width = window.innerWidth;
+                height = window.innerHeight;
+
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+
+                canvas.style.width = width + "px";
+                canvas.style.height = height + "px";
+
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+                const count = Math.min(
+                    75,
+                    Math.max(25, Math.floor(width / 19))
+                );
+
+                nodes = Array.from({ length: count }, () => ({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: reducedMotion ? 0 : (Math.random() - .5) * .35,
+                    vy: reducedMotion ? 0 : (Math.random() - .5) * .35,
+                    radius: Math.random() * 1.5 + .6
+                }));
+
+                draw();
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, width, height);
+
+                const maxDistance = 145;
+
+                nodes.forEach((node, i) => {
+
+                    if (!reducedMotion) {
+                        node.x += node.vx;
+                        node.y += node.vy;
+
+                        if (node.x < 0 || node.x > width) {
+                            node.vx *= -1;
+                        }
+
+                        if (node.y < 0 || node.y > height) {
+                            node.vy *= -1;
+                        }
+                    }
+
+                    const dx = pointer.x - node.x;
+                    const dy = pointer.y - node.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (!reducedMotion && distance < 125 && distance > 0) {
+                        node.x -= dx * .0009;
+                        node.y -= dy * .0009;
+                    }
+
+                    for (let j = i + 1; j < nodes.length; j++) {
+                        const other = nodes[j];
+
+                        const xDistance = node.x - other.x;
+                        const yDistance = node.y - other.y;
+
+                        const separation = Math.sqrt(
+                            xDistance * xDistance +
+                            yDistance * yDistance
+                        );
+
+                        if (separation < maxDistance) {
+                            ctx.beginPath();
+
+                            ctx.strokeStyle =
+                                "rgba(143, 116, 255, " +
+                                (1 - separation / maxDistance) * .20 +
+                                ")";
+
+                            ctx.lineWidth = .7;
+
+                            ctx.moveTo(node.x, node.y);
+                            ctx.lineTo(other.x, other.y);
+                            ctx.stroke();
+                        }
+                    }
+
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+
+                    ctx.fillStyle = "rgba(177, 146, 255, .48)";
+                    ctx.fill();
+                });
+
+                if (!reducedMotion) {
+                    animationFrame = requestAnimationFrame(draw);
+                }
+            }
+
+            window.addEventListener("resize", resizeCanvas);
+
+            window.addEventListener("pointermove", function (event) {
+                pointer.x = event.clientX;
+                pointer.y = event.clientY;
+            }, { passive: true });
+
+            window.addEventListener("pointerleave", function () {
+                pointer.x = -1000;
+                pointer.y = -1000;
+            });
+
+            document.addEventListener("visibilitychange", function () {
+                if (document.hidden) {
+                    if (animationFrame) {
+                        cancelAnimationFrame(animationFrame);
+                        animationFrame = null;
+                    }
+                } else if (!reducedMotion && !animationFrame) {
+                    draw();
+                }
+            });
+
+            resizeCanvas();
+        })();
+    </script>
+
+    <script src="{{ url_for('static', filename='js/cursor.js') }}?v=1"></script>
+
+</body>
+</html>

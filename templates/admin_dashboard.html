@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | CEC Lost & Found</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0b0a17;
+            --sidebar: #100e20;
+            --card: #19172a;
+            --border: rgba(255,255,255,.08);
+            --text: #f5f2ff;
+            --muted: #a29cb9;
+            --purple: #a78bfa;
+            --green: #5ce6a5;
+            --orange: #ffbd75;
+            --red: #ff7c91;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: var(--text);
+            background:
+                radial-gradient(ellipse at 12% 18%, rgba(150,55,255,.20), transparent 34%),
+                radial-gradient(ellipse at 88% 82%, rgba(35,105,255,.17), transparent 38%),
+                var(--bg);
+            font-family: Inter, Arial, sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        /* NEURAL NETWORK BACKGROUND */
+
+        #admin-neural-network {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* MAIN LAYOUT */
+
+        .app-layout {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            width: 245px;
+            padding: 27px 17px;
+            border-right: 1px solid var(--border);
+            background: rgba(16,14,32,.82);
+            backdrop-filter: blur(24px) saturate(150%);
+            -webkit-backdrop-filter: blur(24px) saturate(150%);
+            box-shadow: 12px 0 45px rgba(0,0,0,.18);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 0 9px 30px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand-icon {
+            display: grid;
+            place-items: center;
+            width: 43px;
+            height: 43px;
+            flex-shrink: 0;
+            border-radius: 13px;
+            background: linear-gradient(135deg,#a855f7,#2563eb);
+            box-shadow: 0 0 23px rgba(139,92,246,.3);
+            font-size: 21px;
+            font-weight: 800;
+        }
+
+        .brand-name {
+            font-size: 15px;
+            font-weight: 750;
+        }
+
+        .brand-name span {
+            display: block;
+            margin-top: 3px;
+            color: var(--purple);
+            font-size: 12px;
+        }
+
+        .nav-label {
+            padding: 28px 12px 12px;
+            color: #77718e;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 13px 14px;
+            border: 1px solid transparent;
+            border-radius: 11px;
+            color: var(--muted);
+            font-size: 13px;
+            transition: .25s ease;
+        }
+
+        .nav-icon {
+            display: grid;
+            place-items: center;
+            width: 22px;
+            font-size: 17px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            border-color: rgba(167,139,250,.25);
+            color: #e4d5ff;
+            background: linear-gradient(
+                100deg,
+                rgba(139,92,246,.20),
+                rgba(79,70,229,.09)
+            );
+            box-shadow:
+                inset 3px 0 #b68aff,
+                0 0 22px rgba(153,88,255,.10);
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 14px 10px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            background: rgba(255,255,255,.035);
+        }
+
+        .profile-avatar {
+            display: grid;
+            place-items: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 11px;
+            color: white;
+            background: linear-gradient(135deg,#9333ea,#4f46e5);
+            font-weight: 700;
+        }
+
+        .profile-info {
+            min-width: 0;
+        }
+
+        .profile-info strong {
+            display: block;
+            overflow: hidden;
+            font-size: 12px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .profile-info small {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .logout-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 14px;
+            border: none;
+            border-radius: 10px;
+            color: #ff9aa9;
+            background: transparent;
+            font-family: inherit;
+            font-size: 13px;
+            text-align: left;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .logout-link:hover {
+            background: rgba(255,124,145,.09);
+            box-shadow: 0 0 18px rgba(255,124,145,.08);
+        }
+
+        /* MAIN CONTENT */
+
+        .main-content {
+            width: calc(100% - 245px);
+            max-width: 1600px;
+            min-width: 0;
+            margin-left: 245px;
+            padding: 30px 4%;
+        }
+
+        /* TOPBAR */
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 32px;
+        }
+
+        .breadcrumb {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .breadcrumb span {
+            color: var(--purple);
+        }
+
+        .admin-access {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 13px;
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            color: #c6bfdc;
+            background: rgba(255,255,255,.035);
+            font-size: 11px;
+        }
+
+        .online-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 9px var(--green);
+        }
+
+        /* FLASH MESSAGES */
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash {
+            padding: 13px 16px;
+            margin-bottom: 9px;
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            background: var(--card);
+            font-size: 13px;
+            transition: opacity .5s ease, transform .5s ease;
+        }
+
+        .flash.success {
+            color: var(--green);
+            border-color: rgba(92,230,165,.2);
+        }
+
+        .flash.error {
+            color: var(--red);
+            border-color: rgba(255,124,145,.2);
+        }
+
+        .flash.fade-out {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+
+        /* HERO */
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 25px;
+            min-height: 220px;
+            padding: 34px;
+            border: 1px solid rgba(174,112,255,.38);
+            border-radius: 23px;
+            background:
+                radial-gradient(circle at 82% 45%,rgba(160,80,255,.25),transparent 30%),
+                linear-gradient(115deg,rgba(42,25,70,.88),rgba(24,31,68,.88));
+            box-shadow:
+                0 18px 50px rgba(0,0,0,.2),
+                inset 0 1px rgba(255,255,255,.07);
+            backdrop-filter: blur(18px);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 620px;
+        }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 17px;
+            color: #c4a7ff;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+        }
+
+        .hero-tag::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #a78bfa;
+            box-shadow: 0 0 12px #a78bfa;
+        }
+
+        .hero h1 {
+            margin-bottom: 12px;
+            font-size: clamp(27px,3vw,38px);
+            letter-spacing: -.8px;
+        }
+
+        .hero h1 span {
+            color: #c4a7ff;
+        }
+
+        .hero p {
+            max-width: 500px;
+            color: #b7b2ca;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .hero-decoration {
+            position: relative;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            width: 155px;
+            height: 155px;
+            margin-right: 45px;
+            border: 1px solid rgba(196,181,253,.22);
+            border-radius: 50%;
+            background: radial-gradient(
+                circle at 35% 30%,
+                rgba(196,181,253,.3),
+                rgba(124,58,237,.12) 55%,
+                rgba(79,70,229,.04)
+            );
+            box-shadow:
+                inset 0 0 30px rgba(167,139,250,.13),
+                0 0 55px rgba(139,92,246,.17);
+            animation: neural-orbit 12s linear infinite;
+        }
+
+        .hero-decoration::before,
+        .hero-decoration::after {
+            content: "";
+            position: absolute;
+            border: 1px solid rgba(196,181,253,.19);
+            border-radius: 50%;
+        }
+
+        .hero-decoration::before {
+            inset: -17px;
+        }
+
+        .hero-decoration::after {
+            inset: -34px;
+            border-style: dashed;
+            border-color: rgba(167,139,250,.16);
+        }
+
+        .hero-symbol {
+            color: #e9ddff;
+            font-size: 53px;
+            text-shadow: 0 0 30px #a78bfa;
+            animation: symbol-pulse 3.5s ease-in-out infinite;
+        }
+
+        /* SECTION HEADINGS */
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin: 34px 0 17px;
+        }
+
+        .section-heading h2 {
+            font-size: 17px;
+        }
+
+        .section-heading p {
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .section-caption {
+            color: #817b9c;
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* STATISTICS */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4,minmax(0,1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+            min-height: 143px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            background: linear-gradient(
+                145deg,
+                rgba(38,33,61,.88),
+                rgba(22,20,39,.90)
+            );
+            box-shadow:
+                0 16px 42px rgba(0,0,0,.20),
+                inset 0 1px rgba(255,255,255,.07);
+            backdrop-filter: blur(18px);
+            transition: .25s ease;
+        }
+
+        .stat-card::after {
+            content: "";
+            position: absolute;
+            right: -35px;
+            bottom: -60px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--glow);
+            filter: blur(55px);
+            opacity: .24;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-border);
+            box-shadow: 0 12px 30px rgba(0,0,0,.2);
+        }
+
+        .stat-card.total {
+            --accent: var(--purple);
+            --glow: #8b5cf6;
+            --accent-border: rgba(167,139,250,.4);
+        }
+
+        .stat-card.pending {
+            --accent: var(--orange);
+            --glow: #f59e0b;
+            --accent-border: rgba(255,189,117,.4);
+        }
+
+        .stat-card.approved {
+            --accent: var(--green);
+            --glow: #10b981;
+            --accent-border: rgba(92,230,165,.4);
+        }
+
+        .stat-card.rejected {
+            --accent: var(--red);
+            --glow: #f43f5e;
+            --accent-border: rgba(255,124,145,.4);
+        }
+
+        .stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 19px;
+        }
+
+        .stat-top p {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .stat-icon {
+            display: grid;
+            place-items: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 11px;
+            color: var(--accent);
+            background: rgba(255,255,255,.07);
+            font-size: 17px;
+            box-shadow: 0 0 20px rgba(153,88,255,.18);
+        }
+
+        .stat-card h3 {
+            position: relative;
+            z-index: 1;
+            color: var(--accent);
+            font-size: 32px;
+            font-weight: 750;
+        }
+
+        /* DASHBOARD GRID */
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: minmax(0,1.35fr) minmax(260px,.85fr);
+            gap: 17px;
+            margin-top: 34px;
+        }
+
+        .panel {
+            min-width: 0;
+            padding: 23px;
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            background: linear-gradient(
+                145deg,
+                rgba(31,28,49,.88),
+                rgba(20,19,37,.92)
+            );
+            box-shadow:
+                0 16px 42px rgba(0,0,0,.20),
+                inset 0 1px rgba(255,255,255,.07);
+            backdrop-filter: blur(18px);
+            transition: border-color .25s ease;
+        }
+
+        .panel:hover {
+            border-color: rgba(174,125,255,.28);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .panel-header h3 {
+            font-size: 14px;
+        }
+
+        .panel-header small {
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        /* CLAIM DISTRIBUTION */
+
+        .chart-total {
+            margin-bottom: 20px;
+        }
+
+        .chart-total strong {
+            font-size: 31px;
+        }
+
+        .chart-total span {
+            margin-left: 7px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .progress-track {
+            display: flex;
+            width: 100%;
+            height: 12px;
+            overflow: hidden;
+            border-radius: 20px;
+            background: #302d42;
+        }
+
+        .progress-approved {
+            background: var(--green);
+            transition: width .8s ease;
+        }
+
+        .progress-pending {
+            background: var(--orange);
+            transition: width .8s ease;
+        }
+
+        .progress-rejected {
+            background: var(--red);
+            transition: width .8s ease;
+        }
+
+        .chart-legend {
+            display: grid;
+            grid-template-columns: repeat(2,minmax(0,1fr));
+            gap: 15px;
+            margin-top: 23px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .legend-item strong {
+            margin-left: auto;
+            color: var(--text);
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            flex-shrink: 0;
+            border-radius: 50%;
+        }
+
+        .legend-dot.approved {
+            background: var(--green);
+            box-shadow: 0 0 9px var(--green);
+        }
+
+        .legend-dot.pending {
+            background: var(--orange);
+            box-shadow: 0 0 9px var(--orange);
+        }
+
+        .legend-dot.rejected {
+            background: var(--red);
+            box-shadow: 0 0 9px var(--red);
+        }
+
+        /* QUICK ACTION */
+
+        .quick-action {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 240px;
+            background:
+                radial-gradient(circle at 90% 10%,rgba(139,92,246,.15),transparent 40%),
+                linear-gradient(145deg,rgba(33,29,57,.92),rgba(23,22,41,.95));
+        }
+
+        .quick-icon {
+            display: grid;
+            place-items: center;
+            width: 43px;
+            height: 43px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(167,139,250,.2);
+            border-radius: 13px;
+            color: #c4a7ff;
+            background: rgba(139,92,246,.13);
+            font-size: 23px;
+        }
+
+        .quick-action h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .quick-action p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .review-btn {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 15px;
+            margin-top: 22px;
+            border: 1px solid rgba(167,139,250,.25);
+            border-radius: 11px;
+            color: #e9ddff;
+            background: linear-gradient(
+                100deg,
+                rgba(139,92,246,.23),
+                rgba(79,70,229,.15)
+            );
+            font-size: 11px;
+            font-weight: 700;
+            transition: .25s ease;
+        }
+
+        .review-btn:hover {
+            border-color: #a78bfa;
+            box-shadow: 0 0 24px rgba(139,92,246,.24);
+            transform: translateY(-2px);
+        }
+
+        .review-btn span {
+            font-size: 17px;
+        }
+
+        /* RECENT CLAIMS */
+
+        .recent-panel {
+            margin-top: 20px;
+        }
+
+        .view-all {
+            color: var(--purple);
+            font-size: 11px;
+            transition: .2s ease;
+        }
+
+        .view-all:hover {
+            color: white;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .claims-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .claims-table th {
+            padding: 13px 12px;
+            border-bottom: 1px solid var(--border);
+            color: #817b9c;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+        }
+
+        .claims-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid rgba(255,255,255,.045);
+            color: #d6d0e7;
+            font-size: 12px;
+        }
+
+        .claims-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .claims-table tbody tr:hover {
+            background: rgba(255,255,255,.025);
+        }
+
+        .student-cell strong {
+            display: block;
+            color: var(--text);
+            font-size: 12px;
+        }
+
+        .student-cell small {
+            display: block;
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .status.pending {
+            color: var(--orange);
+            background: rgba(255,189,117,.10);
+        }
+
+        .status.approved {
+            color: var(--green);
+            background: rgba(92,230,165,.10);
+        }
+
+        .status.rejected {
+            color: var(--red);
+            background: rgba(255,124,145,.10);
+        }
+
+        .status.other {
+            color: var(--purple);
+            background: rgba(167,139,250,.10);
+        }
+
+        /* EMPTY STATE */
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 180px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            display: grid;
+            place-items: center;
+            width: 48px;
+            height: 48px;
+            margin-bottom: 15px;
+            border-radius: 15px;
+            color: var(--purple);
+            background: rgba(167,139,250,.10);
+            font-size: 22px;
+        }
+
+        .empty-state strong {
+            font-size: 13px;
+        }
+
+        .empty-state p {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        /* FOOTER */
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 32px;
+            padding: 19px 0;
+            border-top: 1px solid var(--border);
+            color: #77718e;
+            font-size: 10px;
+        }
+
+        .footer span {
+            color: var(--purple);
+        }
+
+        /* ANIMATIONS */
+
+        @keyframes neural-orbit {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes symbol-pulse {
+            0%,100% {
+                transform: scale(1);
+                text-shadow: 0 0 22px #a78bfa;
+            }
+            50% {
+                transform: scale(1.09);
+                text-shadow: 0 0 38px #c4a7ff;
+            }
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 1100px) {
+            .sidebar {
+                width: 215px;
+            }
+
+            .main-content {
+                width: calc(100% - 215px);
+                margin-left: 215px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-action {
+                min-height: 190px;
+            }
+
+            .hero-decoration {
+                margin-right: 25px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .stats-grid {
+                grid-template-columns: repeat(2,minmax(0,1fr));
+            }
+        }
+
+        @media (max-width: 760px) {
+            .sidebar {
+                position: static;
+                width: 100%;
+                height: auto;
+                padding: 13px 16px;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .app-layout {
+                display: block;
+            }
+
+            .brand {
+                padding: 0;
+                border: none;
+            }
+
+            .nav-label,
+            .sidebar-bottom {
+                display: none;
+            }
+
+            .sidebar-nav {
+                flex-direction: row;
+                gap: 8px;
+                overflow-x: auto;
+                padding-top: 14px;
+            }
+
+            .nav-link {
+                flex-shrink: 0;
+                padding: 10px 12px;
+                font-size: 11px;
+            }
+
+            .main-content {
+                width: 100%;
+                margin-left: 0;
+                padding: 23px 5%;
+            }
+
+            .hero {
+                min-height: 190px;
+                padding: 26px;
+            }
+
+            .hero-decoration {
+                width: 105px;
+                height: 105px;
+                margin-right: 20px;
+            }
+
+            .hero-symbol {
+                font-size: 38px;
+            }
+        }
+
+        @media (max-width: 540px) {
+            .topbar {
+                align-items: flex-start;
+            }
+
+            .admin-access {
+                padding: 8px;
+                font-size: 9px;
+            }
+
+            .hero {
+                padding: 23px 20px;
+            }
+
+            .hero-decoration {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 27px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2,minmax(0,1fr));
+                gap: 10px;
+            }
+
+            .stat-card {
+                min-height: 122px;
+                padding: 15px;
+            }
+
+            .stat-card h3 {
+                font-size: 27px;
+            }
+
+            .stat-top p {
+                font-size: 10px;
+            }
+
+            .chart-legend {
+                grid-template-columns: 1fr;
+            }
+
+            .panel {
+                padding: 17px;
+            }
+
+            .footer {
+                flex-direction: column;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+                scroll-behavior: auto !important;
+            }
+
+            #admin-neural-network {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<canvas id="admin-neural-network" aria-hidden="true"></canvas>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <a href="{{ url_for('admin_dashboard') }}" class="brand">
+            <div class="brand-icon">C</div>
+
+            <div class="brand-name">
+                CEC
+                <span>Lost & Found</span>
+            </div>
+        </a>
+
+        <div class="nav-label">Main Menu</div>
+
+        <nav class="sidebar-nav">
+
+            <a href="{{ url_for('admin_dashboard') }}"
+               class="nav-link active">
+                <span class="nav-icon">⌂</span>
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('admin_claims') }}"
+               class="nav-link">
+                <span class="nav-icon">▤</span>
+                Review Claims
+            </a>
+
+            <!-- STUDENTS LINK -->
+
+            <a href="{{ url_for('admin_students') }}"
+               class="nav-link">
+                <span class="nav-icon">♙</span>
+                Students
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="admin-profile">
+
+                <div class="profile-avatar">
+                    {{ session.get('display_name', 'A')[0]|upper }}
+                </div>
+
+                <div class="profile-info">
+                    <strong>
+                        {{ session.get('display_name') }}
+                    </strong>
+                    <small>Administrator</small>
+                </div>
+
+            </div>
+
+            <form method="POST" action="{{ url_for('logout') }}">
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
+                <button type="submit" class="logout-link">
+                    <span>↗</span>
+                    Logout
+                </button>
+            </form>
+
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div class="breadcrumb">
+                Administration / <span>Dashboard</span>
+            </div>
+
+            <div class="admin-access">
+                <span class="online-dot"></span>
+                Administrator Access
+            </div>
+
+        </header>
+
+        <!-- FLASH MESSAGES -->
+
+        <div class="flash-messages">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% for category, message in messages %}
+
+                    <div class="flash {{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endwith %}
+
+        </div>
+
+        <!-- HERO -->
+
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <div class="hero-tag">
+                    Administration Panel
+                </div>
+
+                <h1>
+                    Welcome back,
+                    <span>{{ session.get('display_name') }}</span>!
+                </h1>
+
+                <p>
+                    Manage student claims, monitor verification activity,
+                    and oversee your campus lost and found operations
+                    from one central workspace.
+                </p>
+
+            </div>
+
+            <div class="hero-decoration" aria-hidden="true">
+                <div class="hero-symbol">✦</div>
+            </div>
+
+        </section>
+
+        <!-- DASHBOARD STATISTICS -->
+
+        <section>
+
+            <div class="section-heading">
+
+                <div>
+                    <h2>Dashboard Overview</h2>
+                    <p>A summary of student claim activity.</p>
+                </div>
+
+                <span class="section-caption">
+                    Claim Statistics
+                </span>
+
+            </div>
+
+            <div class="stats-grid">
+
+                <div class="stat-card total">
+                    <div class="stat-top">
+                        <p>Total Claims</p>
+                        <div class="stat-icon">▤</div>
+                    </div>
+                    <h3>{{ total_claims }}</h3>
+                </div>
+
+                <div class="stat-card pending">
+                    <div class="stat-top">
+                        <p>Pending Claims</p>
+                        <div class="stat-icon">◷</div>
+                    </div>
+                    <h3>{{ pending_claims }}</h3>
+                </div>
+
+                <div class="stat-card approved">
+                    <div class="stat-top">
+                        <p>Approved Claims</p>
+                        <div class="stat-icon">✓</div>
+                    </div>
+                    <h3>{{ approved_claims }}</h3>
+                </div>
+
+                <div class="stat-card rejected">
+                    <div class="stat-top">
+                        <p>Rejected Claims</p>
+                        <div class="stat-icon">✕</div>
+                    </div>
+                    <h3>{{ rejected_claims }}</h3>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- CLAIM DISTRIBUTION AND QUICK ACTION -->
+
+        <section class="dashboard-grid">
+
+            <div class="panel">
+
+                <div class="panel-header">
+                    <h3>Claim Distribution</h3>
+                    <small>All submitted claims</small>
+                </div>
+
+                <div class="chart-total">
+                    <strong>{{ total_claims }}</strong>
+                    <span>Total claims received</span>
+                </div>
+
+                {% set approved_percent = (approved_claims / total_claims * 100) if total_claims else 0 %}
+                {% set pending_percent = (pending_claims / total_claims * 100) if total_claims else 0 %}
+                {% set rejected_percent = (rejected_claims / total_claims * 100) if total_claims else 0 %}
+
+                <div class="progress-track">
+
+    <div
+        class="progress-approved"
+        data-percent="{{ approved_percent }}">
+    </div>
+
+    <div
+        class="progress-pending"
+        data-percent="{{ pending_percent }}">
+    </div>
+
+    <div
+        class="progress-rejected"
+        data-percent="{{ rejected_percent }}">
+    </div>
+
+</div>
+
+                <div class="chart-legend">
+
+                    <div class="legend-item">
+                        <span class="legend-dot approved"></span>
+                        Approved
+                        <strong>{{ approved_claims }}</strong>
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="legend-dot pending"></span>
+                        Pending
+                        <strong>{{ pending_claims }}</strong>
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="legend-dot rejected"></span>
+                        Rejected
+                        <strong>{{ rejected_claims }}</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- QUICK ACTION -->
+
+            <div class="panel quick-action">
+
+                <div>
+
+                    <div class="quick-icon">⌕</div>
+
+                    <h3>Review Student Claims</h3>
+
+                    <p>
+                        Examine ownership explanations and supporting
+                        images before approving or rejecting claims.
+                    </p>
+
+                </div>
+
+                <a href="{{ url_for('admin_claims') }}"
+                   class="review-btn">
+
+                    Open Claim Management
+                    <span>→</span>
+
+                </a>
+
+            </div>
+
+        </section>
+
+        <!-- RECENT CLAIM ACTIVITY -->
+
+        <section class="panel recent-panel">
+
+            <div class="panel-header">
+
+                <div>
+                    <h3>Recent Claim Activity</h3>
+                    <small>Latest five submitted student claims</small>
+                </div>
+
+                <a href="{{ url_for('admin_claims') }}"
+                   class="view-all">
+                    View all claims →
+                </a>
+
+            </div>
+
+            {% if recent_claims %}
+
+                <div class="table-wrapper">
+
+                    <table class="claims-table">
+
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Item</th>
+                                <th>Submitted</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for claim in recent_claims %}
+
+                                <tr>
+
+                                    <td>
+                                        <div class="student-cell">
+
+                                            <strong>
+                                                {{ claim.user.full_name }}
+                                            </strong>
+
+                                            <small>
+                                                {{ claim.user.usn }}
+                                            </small>
+
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        {{ claim.item.item_name }}
+                                    </td>
+
+                                    <td>
+                                        {{ claim.created_at.strftime('%d %b %Y') if claim.created_at else '—' }}
+                                    </td>
+
+                                    <td>
+
+                                        {% set status = claim.status|lower %}
+
+                                        <span class="status {% if status == 'pending' %}pending{% elif status == 'approved' %}approved{% elif status == 'rejected' %}rejected{% else %}other{% endif %}">
+                                            {{ claim.status }}
+                                        </span>
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">▤</div>
+
+                    <strong>No claims submitted yet</strong>
+
+                    <p>
+                        Student claim submissions will appear here.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+        <!-- FOOTER -->
+
+        <footer class="footer">
+
+            <p>
+                CEC Lost & Found · Administration Panel
+            </p>
+
+            <p>
+                Secure <span>Administrator</span> Access
+            </p>
+
+        </footer>
+
+    </main>
+
+</div>
+
+<!-- NEURAL NETWORK ANIMATION -->
+
+<script>
+(() => {
+
+    const canvas = document.getElementById("admin-neural-network");
+
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) return;
+
+    const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+    );
+
+    if (reduceMotion.matches) return;
+
+    let width = 0;
+    let height = 0;
+    let particles = [];
+    let frame = null;
+
+    const pointer = {
+        x: 0,
+        y: 0,
+        active: false,
+        radius: 165
+    };
+
+    const config = {
+        maxParticles: 145,
+        density: 9500,
+        linkDistance: 150,
+        speed: 0.34
+    };
+
+    const random = (min, max) =>
+        Math.random() * (max - min) + min;
+
+    function makeParticle() {
+
+        const angle = random(0, Math.PI * 2);
+        const speed = random(0.08, config.speed);
+
+        return {
+            x: random(0, width),
+            y: random(0, height),
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            radius: random(1, 2.2),
+            phase: random(0, Math.PI * 2),
+            pulse: random(0.008, 0.022),
+            color: Math.random() > 0.48
+                ? "190, 105, 255"
+                : "75, 135, 255"
+        };
+    }
+
+    function resize() {
+
+        const oldWidth = width || window.innerWidth;
+        const oldHeight = height || window.innerHeight;
+
+        width = window.innerWidth;
+        height = window.innerHeight;
+
+        const dpr = Math.min(
+            window.devicePixelRatio || 1,
+            2
+        );
+
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+
+        canvas.style.width = width + "px";
+        canvas.style.height = height + "px";
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        particles.forEach(p => {
+            p.x *= width / oldWidth;
+            p.y *= height / oldHeight;
+        });
+
+        const count = Math.min(
+            config.maxParticles,
+            Math.max(
+                45,
+                Math.floor(width * height / config.density)
+            )
+        );
+
+        while (particles.length < count) {
+            particles.push(makeParticle());
+        }
+
+        particles.length = Math.min(
+            particles.length,
+            count
+        );
+    }
+
+    function update() {
+
+        for (const p of particles) {
+
+            p.phase += p.pulse;
+
+            p.x += p.vx;
+            p.y += p.vy;
+
+            if (pointer.active) {
+
+                const dx = p.x - pointer.x;
+                const dy = p.y - pointer.y;
+
+                const distance = Math.hypot(dx, dy);
+
+                if (
+                    distance > 0 &&
+                    distance < pointer.radius
+                ) {
+
+                    const force =
+                        (pointer.radius - distance) /
+                        pointer.radius;
+
+                    p.x += (dx / distance) * force * 1.25;
+                    p.y += (dy / distance) * force * 1.25;
+                }
+            }
+
+            if (p.x < 0 || p.x > width) {
+                p.vx *= -1;
+            }
+
+            if (p.y < 0 || p.y > height) {
+                p.vy *= -1;
+            }
+
+            p.x = Math.max(0, Math.min(width, p.x));
+            p.y = Math.max(0, Math.min(height, p.y));
+        }
+    }
+
+    function drawLinks() {
+
+        const limit =
+            config.linkDistance * config.linkDistance;
+
+        for (let i = 0; i < particles.length; i++) {
+
+            for (let j = i + 1; j < particles.length; j++) {
+
+                const a = particles[i];
+                const b = particles[j];
+
+                const dx = a.x - b.x;
+                const dy = a.y - b.y;
+
+                const distanceSquared =
+                    dx * dx + dy * dy;
+
+                if (distanceSquared >= limit) continue;
+
+                const opacity =
+                    (1 - Math.sqrt(distanceSquared) /
+                    config.linkDistance) * 0.28;
+
+                ctx.beginPath();
+
+                ctx.strokeStyle =
+                    `rgba(160, 105, 255, ${opacity})`;
+
+                ctx.lineWidth = 0.7;
+
+                ctx.moveTo(a.x, a.y);
+                ctx.lineTo(b.x, b.y);
+
+                ctx.stroke();
+            }
+        }
+    }
+
+    function drawParticles() {
+
+        for (const p of particles) {
+
+            const pulse =
+                0.65 + Math.sin(p.phase) * 0.35;
+
+            const radius = p.radius * 5;
+
+            const glow = ctx.createRadialGradient(
+                p.x, p.y, 0,
+                p.x, p.y, radius
+            );
+
+            glow.addColorStop(
+                0,
+                `rgba(${p.color}, ${0.75 * pulse})`
+            );
+
+            glow.addColorStop(
+                1,
+                `rgba(${p.color}, 0)`
+            );
+
+            ctx.beginPath();
+            ctx.fillStyle = glow;
+
+            ctx.arc(
+                p.x,
+                p.y,
+                radius,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fill();
+
+            ctx.beginPath();
+
+            ctx.fillStyle =
+                `rgba(235, 220, 255, ${0.8 * pulse})`;
+
+            ctx.arc(
+                p.x,
+                p.y,
+                p.radius,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fill();
+        }
+    }
+
+    function drawPointerGlow() {
+
+        if (!pointer.active) return;
+
+        const glow = ctx.createRadialGradient(
+            pointer.x,
+            pointer.y,
+            0,
+            pointer.x,
+            pointer.y,
+            pointer.radius
+        );
+
+        glow.addColorStop(
+            0,
+            "rgba(153, 80, 255, .075)"
+        );
+
+        glow.addColorStop(
+            1,
+            "rgba(153, 80, 255, 0)"
+        );
+
+        ctx.fillStyle = glow;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            pointer.x,
+            pointer.y,
+            pointer.radius,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+    }
+
+    function animate() {
+
+        ctx.clearRect(0, 0, width, height);
+
+        update();
+        drawLinks();
+        drawParticles();
+        drawPointerGlow();
+
+        frame = requestAnimationFrame(animate);
+    }
+
+    window.addEventListener(
+        "pointermove",
+        event => {
+
+            if (event.pointerType === "touch") return;
+
+            pointer.x = event.clientX;
+            pointer.y = event.clientY;
+            pointer.active = true;
+
+        },
+        { passive: true }
+    );
+
+    window.addEventListener(
+        "pointerout",
+        event => {
+
+            if (!event.relatedTarget) {
+                pointer.active = false;
+            }
+
+        },
+        { passive: true }
+    );
+
+    window.addEventListener(
+        "resize",
+        resize,
+        { passive: true }
+    );
+
+    document.addEventListener(
+        "visibilitychange",
+        () => {
+
+            if (document.hidden && frame !== null) {
+
+                cancelAnimationFrame(frame);
+                frame = null;
+
+            } else if (!document.hidden && frame === null) {
+
+                animate();
+
+            }
+
+        }
+    );
+
+    resize();
+    animate();
+
+})();
+</script>
+
+<!-- DASHBOARD INTERACTIONS -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* Animate claim distribution bars */
+
+    const progressBars = document.querySelectorAll(
+        ".progress-track [data-percent]"
+    );
+
+    progressBars.forEach(function (bar) {
+
+        const percentage = Number(
+            bar.dataset.percent
+        );
+
+        if (Number.isFinite(percentage)) {
+
+            bar.style.width = Math.min(
+                100,
+                Math.max(0, percentage)
+            ) + "%";
+
+        }
+
+    });
+
+    /* Automatically dismiss flash messages */
+
+    const messages = document.querySelectorAll(".flash");
+
+    messages.forEach(function (message) {
+
+        setTimeout(function () {
+
+            message.classList.add("fade-out");
+
+            setTimeout(function () {
+                message.remove();
+            }, 500);
+
+        }, 4000);
+
+    });
+
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1042 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Report | CEC Lost & Found</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            min-height: 100%;
+            font-family: Inter, Arial, sans-serif;
+            background: #130d1c;
+            color: #f4f5ff;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 12px 20px;
+            overflow-x: hidden;
+        }
+
+        /* NEURAL NETWORK BACKGROUND */
+
+        #neural-network {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(
+                    circle at 12% 18%,
+                    rgba(147, 51, 234, .22),
+                    transparent 35%
+                ),
+                radial-gradient(
+                    circle at 88% 80%,
+                    rgba(37, 99, 235, .17),
+                    transparent 38%
+                ),
+                linear-gradient(
+                    135deg,
+                    rgba(29, 12, 42, .5),
+                    rgba(16, 16, 37, .75)
+                );
+        }
+
+        .edit-page {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 1120px;
+            margin: 0 auto;
+            padding-bottom: 20px;
+        }
+
+        /* HEADER */
+
+        .edit-header {
+            margin-bottom: 15px;
+        }
+
+        .edit-header h1 {
+            font-size: clamp(26px, 3vw, 36px);
+            font-weight: 800;
+            margin: 0 0 5px;
+            background: linear-gradient(
+                90deg,
+                #ffffff,
+                #d879ff,
+                #a78bfa
+            );
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .edit-header p {
+            color: #aaa1bd;
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* FORM CARD */
+
+        .edit-card {
+            position: relative;
+            overflow: hidden;
+            background: rgba(34, 25, 48, .90);
+            border: 1px solid rgba(180, 93, 255, .3);
+            border-radius: 19px;
+            padding: 19px 25px;
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, .3),
+                0 0 35px rgba(147, 51, 234, .08);
+            backdrop-filter: blur(16px);
+        }
+
+        .edit-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(
+                90deg,
+                #9228ee,
+                #e04de9,
+                #477bff,
+                #9228ee
+            );
+            background-size: 250% 100%;
+            animation: borderShine 5s linear infinite;
+        }
+
+        .edit-card::after {
+            content: "";
+            position: absolute;
+            top: -120px;
+            right: -90px;
+            width: 260px;
+            height: 260px;
+            border: 1px solid rgba(192, 132, 252, .13);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        @keyframes borderShine {
+            from { background-position: 0% 50%; }
+            to { background-position: 250% 50%; }
+        }
+
+        /* SECTION HEADINGS */
+
+        .section-title {
+            position: relative;
+            font-size: 17px;
+            font-weight: 750;
+            margin: 15px 0 12px;
+            padding-left: 15px;
+            color: #e5caff;
+        }
+
+        .section-title::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 1px;
+            width: 4px;
+            height: 21px;
+            border-radius: 5px;
+            background: linear-gradient(
+                180deg,
+                #e34cf2,
+                #9136f5
+            );
+            box-shadow: 0 0 14px rgba(217, 70, 239, .7);
+        }
+
+        .section-title:first-child {
+            margin-top: 12px;
+        }
+
+        /* FORM GRID */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px 20px;
+        }
+
+        .form-group {
+            margin-bottom: 5px;
+            min-width: 0;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label,
+        .upload-label {
+            display: block;
+            color: #d5c9e8;
+            font-size: 12px;
+            font-weight: 650;
+            margin-bottom: 7px;
+        }
+
+        /* INPUTS */
+
+        .form-control {
+            width: 100%;
+            min-height: 43px;
+            padding: 10px 13px;
+            border-radius: 10px;
+            border: 1px solid rgba(167, 139, 250, .22);
+            background: rgba(26, 25, 49, .95);
+            color: #f5efff;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            transition: .25s ease;
+        }
+
+        .form-control:hover {
+            border-color: rgba(192, 132, 252, .5);
+        }
+
+        .form-control:focus {
+            border-color: #d946ef;
+            box-shadow:
+                0 0 0 3px rgba(217, 70, 239, .12),
+                0 0 20px rgba(147, 51, 234, .12);
+        }
+
+        .form-control option {
+            background: #211832;
+            color: white;
+        }
+
+        textarea.form-control {
+            min-height: 85px;
+            height: 85px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        input[type="date"] {
+            color-scheme: dark;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            filter: invert(1);
+        }
+
+        .help-text {
+            display: block;
+            margin-top: 5px;
+            color: #9a8eae;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        /* CURRENT IMAGES */
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(
+                auto-fill,
+                minmax(140px, 1fr)
+            );
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .image-card {
+            overflow: hidden;
+            border: 1px solid rgba(180, 93, 255, .25);
+            border-radius: 12px;
+            background: rgba(26, 25, 49, .95);
+            transition: .25s ease;
+        }
+
+        .image-card:hover {
+            transform: translateY(-3px);
+            border-color: #c084fc;
+            box-shadow: 0 10px 25px rgba(147, 51, 234, .16);
+        }
+
+        .image-card img {
+            display: block;
+            width: 100%;
+            height: 105px;
+            object-fit: cover;
+        }
+
+        .image-card-footer {
+            padding: 9px;
+        }
+
+        .remove-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ff9dbd;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .remove-option input {
+            accent-color: #e044a9;
+            cursor: pointer;
+        }
+
+        /* IMAGE UPLOAD */
+
+        .upload-box {
+            border: 1px dashed rgba(192, 132, 252, .55);
+            border-radius: 13px;
+            padding: 15px;
+            background: rgba(124, 58, 237, .07);
+            transition: .25s ease;
+        }
+
+        .upload-box:hover {
+            border-color: #e879f9;
+            background: rgba(147, 51, 234, .12);
+            box-shadow: 0 0 25px rgba(147, 51, 234, .1);
+        }
+
+        .upload-box input {
+            width: 100%;
+            color: #d5c9e8;
+            font-size: 12px;
+        }
+
+        .upload-box input::file-selector-button {
+            padding: 8px 13px;
+            margin-right: 10px;
+            border: 1px solid rgba(192, 132, 252, .4);
+            border-radius: 8px;
+            background: #38204e;
+            color: #efd9ff;
+            font-weight: 650;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .upload-box input::file-selector-button:hover {
+            background: #6932a0;
+        }
+
+        .empty-images {
+            padding: 14px;
+            border: 1px dashed rgba(167, 139, 250, .25);
+            border-radius: 10px;
+            background: rgba(148, 163, 255, .04);
+            color: #9a8eae;
+            font-size: 12px;
+        }
+
+        /* FORM ACTIONS */
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(180, 93, 255, .17);
+        }
+
+        .btn {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 42px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 750;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition:
+                transform .25s ease,
+                box-shadow .25s ease,
+                filter .25s ease;
+        }
+
+        /* SHINY SAVE BUTTON */
+
+        .btn-primary {
+            color: white;
+            background: linear-gradient(
+                110deg,
+                #9228ee,
+                #d946ef,
+                #6d45ef,
+                #9228ee
+            );
+            background-size: 250% 100%;
+            box-shadow:
+                0 5px 20px rgba(147, 51, 234, .3),
+                0 0 15px rgba(217, 70, 239, .12);
+            animation: buttonGradient 5s ease infinite;
+        }
+
+        .btn-primary::before {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            top: -50%;
+            left: -110%;
+            width: 55%;
+            height: 200%;
+            background: linear-gradient(
+                110deg,
+                transparent,
+                rgba(255, 255, 255, .12),
+                rgba(255, 255, 255, .75),
+                rgba(255, 255, 255, .12),
+                transparent
+            );
+            transform: skewX(-25deg);
+            transition: left .7s ease;
+        }
+
+        .btn-primary:hover::before {
+            left: 160%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.15);
+            box-shadow:
+                0 0 18px rgba(217, 70, 239, .65),
+                0 0 35px rgba(147, 51, 234, .35),
+                0 8px 25px rgba(0, 0, 0, .2);
+        }
+
+        @keyframes buttonGradient {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .btn-secondary {
+            color: #e6d9f8;
+            background: rgba(148, 163, 255, .08);
+            border: 1px solid rgba(192, 132, 252, .35);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            background: rgba(147, 51, 234, .16);
+            border-color: #c084fc;
+            box-shadow: 0 0 18px rgba(147, 51, 234, .2);
+        }
+
+        /* CUSTOM CURSOR */
+
+        .custom-cursor,
+        .cursor-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 99999;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .custom-cursor {
+            width: 7px;
+            height: 7px;
+            background: #fff;
+            box-shadow:
+                0 0 8px #fff,
+                0 0 15px #e879f9,
+                0 0 25px #a020f0;
+        }
+
+        .cursor-glow {
+            z-index: 99998;
+            width: 30px;
+            height: 30px;
+            border: 1px solid rgba(217, 70, 239, .85);
+            background: rgba(160, 32, 240, .06);
+            box-shadow: 0 0 18px rgba(217, 70, 239, .2);
+            transition:
+                width .2s ease,
+                height .2s ease,
+                border-color .2s ease;
+        }
+
+        .cursor-glow.hovering {
+            width: 43px;
+            height: 43px;
+            border-color: #f0abfc;
+            box-shadow: 0 0 24px rgba(217, 70, 239, .5);
+        }
+
+        @media (pointer: fine) {
+            body,
+            a,
+            button,
+            input,
+            select,
+            textarea,
+            label {
+                cursor: none !important;
+            }
+        }
+
+        @media (pointer: coarse) {
+            .custom-cursor,
+            .cursor-glow {
+                display: none;
+            }
+        }
+
+        /* SHORT SCREEN OPTIMIZATION */
+
+        @media (max-height: 800px) and (min-width: 700px) {
+            body {
+                padding-top: 8px;
+            }
+
+            .edit-header {
+                margin-bottom: 10px;
+            }
+
+            .edit-header h1 {
+                font-size: 30px;
+            }
+
+            .edit-card {
+                padding-top: 13px;
+                padding-bottom: 15px;
+            }
+
+            .section-title {
+                margin-top: 10px;
+                margin-bottom: 8px;
+            }
+
+            .form-grid {
+                gap: 9px 18px;
+            }
+
+            .form-control {
+                min-height: 39px;
+                padding: 8px 12px;
+            }
+
+            textarea.form-control {
+                min-height: 68px;
+                height: 68px;
+            }
+
+            .help-text {
+                margin-top: 4px;
+            }
+
+            .form-actions {
+                margin-top: 14px;
+                padding-top: 12px;
+            }
+
+            .btn {
+                min-height: 38px;
+            }
+        }
+
+        /* MOBILE RESPONSIVE */
+
+        @media (max-width: 750px) {
+            body {
+                padding: 18px 12px;
+            }
+
+            .edit-card {
+                padding: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .form-group.full-width {
+                grid-column: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .edit-header h1 {
+                font-size: 27px;
+            }
+
+            .edit-card {
+                padding: 17px;
+                border-radius: 16px;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+            }
+
+            .upload-box {
+                padding: 13px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NEURAL NETWORK BACKGROUND -->
+    <canvas id="neural-network"></canvas>
+
+    <!-- CUSTOM CURSOR -->
+    <div class="cursor-glow"></div>
+    <div class="custom-cursor"></div>
+
+    <main class="edit-page">
+
+        <header class="edit-header">
+            <h1>Edit Your Report</h1>
+            <p>
+                Update the information and images associated with your lost or found item.
+            </p>
+        </header>
+
+        <div class="edit-card">
+
+            <form method="POST"
+                  action="{{ url_for('edit_report', item_id=item.id) }}"
+                  enctype="multipart/form-data">
+
+                <input type="hidden"
+                       name="csrf_token"
+                       value="{{ csrf_token() }}">
+
+                <h2 class="section-title">Report Information</h2>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="report_type">Report Type</label>
+
+                        <select class="form-control"
+                                id="report_type"
+                                name="report_type"
+                                required>
+
+                            <option value="lost"
+                                {% if item.report_type == 'lost' %}selected{% endif %}>
+                                Lost Item
+                            </option>
+
+                            <option value="found"
+                                {% if item.report_type == 'found' %}selected{% endif %}>
+                                Found Item
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="item_name">Item Name</label>
+
+                        <input class="form-control"
+                               type="text"
+                               id="item_name"
+                               name="item_name"
+                               maxlength="120"
+                               value="{{ item.item_name }}"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category</label>
+
+                        <input class="form-control"
+                               type="text"
+                               id="category"
+                               name="category"
+                               maxlength="50"
+                               value="{{ item.category }}"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Location</label>
+
+                        <input class="form-control"
+                               type="text"
+                               id="location"
+                               name="location"
+                               maxlength="150"
+                               value="{{ item.location }}"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="report_date">Date</label>
+
+                        <input class="form-control"
+                               type="date"
+                               id="report_date"
+                               name="report_date"
+                               value="{% if item.report_type == 'lost' and item.date_lost %}{{ item.date_lost.strftime('%Y-%m-%d') }}{% elif item.report_type == 'found' and item.date_found %}{{ item.date_found.strftime('%Y-%m-%d') }}{% endif %}"
+                               required>
+
+                        <span class="help-text">
+                            Select the date using the calendar.
+                        </span>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="description">Description</label>
+
+                        <textarea class="form-control"
+                                  id="description"
+                                  name="description"
+                                  required>{{ item.description }}</textarea>
+                    </div>
+
+                </div>
+
+                <!-- CURRENT IMAGES -->
+
+                <h2 class="section-title">Current Images</h2>
+
+                {% if item.images %}
+
+                    <p class="help-text">
+                        Select the images you want to remove.
+                        Unselected images will be retained.
+                    </p>
+
+                    <div class="image-grid">
+
+                        {% for image in item.images %}
+
+                            <div class="image-card">
+
+                                <img
+                                    src="{{ url_for('uploaded_file', filename=image.filename) }}"
+                                    alt="Image of {{ item.item_name }}"
+                                >
+
+                                <div class="image-card-footer">
+
+                                    <label class="remove-option">
+
+                                        <input type="checkbox"
+                                               name="remove_image_ids"
+                                               value="{{ image.id }}">
+
+                                        Remove image
+
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="empty-images">
+                        No images have been uploaded for this report.
+                    </div>
+
+                {% endif %}
+
+                <!-- ADD MORE IMAGES -->
+
+                <h2 class="section-title">Add More Images</h2>
+
+                <div class="upload-box">
+
+                    <label for="images" class="upload-label">
+                        Choose additional images
+                    </label>
+
+                    <input type="file"
+                           id="images"
+                           name="images"
+                           accept="image/png,image/jpeg,image/webp"
+                           multiple>
+
+                    <span class="help-text">
+                        Select additional images if required.
+                        Existing images will be retained unless you select them for removal.
+                        Maximum 5 images per report.
+                    </span>
+
+                </div>
+
+                <!-- FORM ACTIONS -->
+
+                <div class="form-actions">
+
+                    <a href="{{ url_for('my_reports') }}"
+                       class="btn btn-secondary">
+                        Cancel
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Save Changes →
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </main>
+
+    <script>
+        /* =====================================
+           NEURAL NETWORK BACKGROUND
+        ===================================== */
+
+        const canvas = document.getElementById("neural-network");
+        const ctx = canvas.getContext("2d");
+
+        let particles = [];
+        let resizeTimeout;
+
+        const particleCount = 85;
+        const connectionDistance = 145;
+
+        function resizeCanvas() {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
+
+            canvas.style.width = window.innerWidth + "px";
+            canvas.style.height = window.innerHeight + "px";
+
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            createParticles();
+        }
+
+        function createParticles() {
+            particles = [];
+
+            const count = Math.min(
+                particleCount,
+                Math.max(35, Math.floor(window.innerWidth / 13))
+            );
+
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * window.innerWidth,
+                    y: Math.random() * window.innerHeight,
+                    vx: (Math.random() - .5) * .42,
+                    vy: (Math.random() - .5) * .42,
+                    radius: Math.random() * 1.8 + 1
+                });
+            }
+        }
+
+        function drawNetwork() {
+            ctx.clearRect(
+                0,
+                0,
+                window.innerWidth,
+                window.innerHeight
+            );
+
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0 || p.x > window.innerWidth) {
+                    p.vx *= -1;
+                }
+
+                if (p.y < 0 || p.y > window.innerHeight) {
+                    p.vy *= -1;
+                }
+            });
+
+            /* CONNECTION LINES */
+
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+
+                    const p1 = particles[i];
+                    const p2 = particles[j];
+
+                    const dx = p1.x - p2.x;
+                    const dy = p1.y - p2.y;
+
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < connectionDistance) {
+
+                        const opacity =
+                            (1 - distance / connectionDistance) * .24;
+
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+
+                        ctx.strokeStyle =
+                            `rgba(190, 75, 245, ${opacity})`;
+
+                        ctx.lineWidth = .8;
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            /* PARTICLES */
+
+            particles.forEach(p => {
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+
+                ctx.fillStyle = "#d946ef";
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = "#d946ef";
+
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+            });
+
+            requestAnimationFrame(drawNetwork);
+        }
+
+        resizeCanvas();
+        drawNetwork();
+
+        window.addEventListener("resize", () => {
+            clearTimeout(resizeTimeout);
+
+            resizeTimeout = setTimeout(() => {
+                resizeCanvas();
+            }, 150);
+        });
+
+        /* =====================================
+           CUSTOM NEON CURSOR
+        ===================================== */
+
+        document.addEventListener("DOMContentLoaded", () => {
+
+            const cursor = document.querySelector(".custom-cursor");
+            const glow = document.querySelector(".cursor-glow");
+
+            if (!cursor || !glow) return;
+
+            if (!window.matchMedia("(pointer: fine)").matches) {
+                cursor.style.display = "none";
+                glow.style.display = "none";
+                return;
+            }
+
+            let mouseX = 0;
+            let mouseY = 0;
+            let glowX = 0;
+            let glowY = 0;
+
+            document.addEventListener("mousemove", event => {
+
+                mouseX = event.clientX;
+                mouseY = event.clientY;
+
+                cursor.style.left = mouseX + "px";
+                cursor.style.top = mouseY + "px";
+
+            });
+
+            function animateGlow() {
+
+                glowX += (mouseX - glowX) * .17;
+                glowY += (mouseY - glowY) * .17;
+
+                glow.style.left = glowX + "px";
+                glow.style.top = glowY + "px";
+
+                requestAnimationFrame(animateGlow);
+            }
+
+            animateGlow();
+
+            document.querySelectorAll(
+                "a, button, input, select, textarea, label"
+            ).forEach(element => {
+
+                element.addEventListener("mouseenter", () => {
+                    glow.classList.add("hovering");
+                });
+
+                element.addEventListener("mouseleave", () => {
+                    glow.classList.remove("hovering");
+                });
+
+            });
+
+        });
+    </script>
+
+</body>
+</html>

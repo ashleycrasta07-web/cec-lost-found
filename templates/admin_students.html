@@ -1,0 +1,1494 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students | CEC Lost &amp; Found</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        :root {
+            --bg: #0d0b19;
+            --sidebar: #171426;
+            --panel: rgba(32, 28, 53, .83);
+            --purple: #b58aff;
+            --blue: #438cff;
+            --text: #f5f2ff;
+            --muted: #aaa5bf;
+            --border: rgba(181, 138, 255, .17);
+            --green: #5ce6a5;
+            --red: #ff8197;
+        }
+
+        body {
+            min-height: 100vh;
+            color: var(--text);
+            background:
+                radial-gradient(
+                    ellipse at 10% 10%,
+                    rgba(132, 60, 255, .17),
+                    transparent 38%
+                ),
+                radial-gradient(
+                    ellipse at 90% 90%,
+                    rgba(35, 105, 255, .14),
+                    transparent 40%
+                ),
+                var(--bg);
+            overflow-x: hidden;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        /* NEURAL NETWORK BACKGROUND */
+
+        #neural-network {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .ambient-glow {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .orb {
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: .14;
+            animation: floatOrb 12s ease-in-out infinite alternate;
+        }
+
+        .orb-one {
+            background: #a855f7;
+            top: 5%;
+            left: -130px;
+        }
+
+        .orb-two {
+            background: #287dff;
+            right: -130px;
+            bottom: 5%;
+            animation-delay: -5s;
+        }
+
+        @keyframes floatOrb {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(50px, -35px);
+            }
+        }
+
+        /* MAIN LAYOUT */
+
+        .layout {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            position: fixed;
+            inset: 0 auto 0 0;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            width: 245px;
+            min-height: 100vh;
+            padding: 25px 17px;
+            background: rgba(23, 20, 38, .94);
+            border-right: 1px solid rgba(181, 138, 255, .13);
+            backdrop-filter: blur(22px);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 0 9px 27px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .brand-icon {
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+            background: linear-gradient(135deg, #a855f7, #477cff);
+            box-shadow: 0 0 23px rgba(139,92,246,.35);
+        }
+
+        .brand-name span {
+            display: block;
+            margin-top: 3px;
+            color: #b58aff;
+            font-size: 10px;
+            letter-spacing: .5px;
+        }
+
+        .nav-label {
+            margin: 16px 10px 12px;
+            color: #77718e;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 13px;
+            margin-bottom: 7px;
+            border: 1px solid transparent;
+            border-radius: 11px;
+            color: #aaa5bf;
+            background: transparent;
+            font-size: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: .25s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: white;
+            border-color: rgba(181,138,255,.25);
+            background: linear-gradient(
+                110deg,
+                rgba(139,92,246,.22),
+                rgba(59,130,246,.10)
+            );
+            box-shadow: inset 3px 0 #b58aff;
+        }
+
+        .nav-icon {
+            display: grid;
+            place-items: center;
+            width: 25px;
+            height: 25px;
+            border-radius: 8px;
+            background: rgba(181,138,255,.10);
+            font-size: 14px;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 10px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(181,138,255,.12);
+            border-radius: 12px;
+            background: rgba(255,255,255,.035);
+        }
+
+        .profile-icon {
+            display: grid;
+            place-items: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg,#a855f7,#477cff);
+            font-weight: 800;
+        }
+
+        .profile-text strong {
+            display: block;
+            font-size: 11px;
+        }
+
+        .profile-text small {
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .logout-btn {
+            width: 100%;
+            border: 0;
+            color: #ff8ca3;
+            background: transparent;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,100,130,.09);
+            border-color: rgba(255,100,130,.2);
+        }
+
+        /* MAIN CONTENT */
+
+        .main {
+            width: calc(100% - 245px);
+            min-width: 0;
+            margin-left: 245px;
+            padding: 28px 38px 45px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 38px;
+        }
+
+        .breadcrumb {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .breadcrumb span {
+            color: #bd9aff;
+        }
+
+        .admin-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 9px 14px;
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            color: #d2c6ee;
+            background: rgba(255,255,255,.035);
+            font-size: 10px;
+        }
+
+        .admin-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 10px var(--green);
+        }
+
+        /* PAGE HEADING */
+
+        .page-heading {
+            margin-bottom: 28px;
+            animation: fadeUp .65s ease both;
+        }
+
+        .eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 12px;
+            color: #bd9aff;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .eyebrow::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #b58aff;
+            box-shadow: 0 0 12px #b58aff;
+        }
+
+        .page-heading h1 {
+            margin-bottom: 9px;
+            font-size: clamp(29px, 4vw, 37px);
+            letter-spacing: -1px;
+        }
+
+        .page-heading h1 span {
+            background: linear-gradient(90deg,#d1a8ff,#8ba7ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-heading p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        /* FLASH MESSAGES */
+
+        .flash-message {
+            padding: 13px 16px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(181,138,255,.25);
+            border-radius: 11px;
+            color: #d1baff;
+            background: rgba(124,92,255,.10);
+            font-size: 12px;
+            transition: opacity .5s ease, transform .5s ease;
+        }
+
+        .flash-message.fade-out {
+            opacity: 0;
+            transform: translateY(-8px);
+            pointer-events: none;
+        }
+
+        /* STATISTICS */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 17px;
+            margin-bottom: 23px;
+        }
+
+        .stats-card {
+            position: relative;
+            overflow: hidden;
+            padding: 21px 23px;
+            border: 1px solid rgba(181,138,255,.18);
+            border-radius: 16px;
+            background:
+                radial-gradient(
+                    circle at 100% 0%,
+                    rgba(139,92,246,.15),
+                    transparent 50%
+                ),
+                linear-gradient(
+                    145deg,
+                    rgba(39,32,64,.85),
+                    rgba(24,24,43,.91)
+                );
+            backdrop-filter: blur(18px);
+            box-shadow: 0 12px 30px rgba(0,0,0,.16);
+            transition: .3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(181,138,255,.4);
+            box-shadow: 0 15px 35px rgba(139,92,246,.10);
+        }
+
+        .stats-card p {
+            margin-bottom: 12px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .stats-value {
+            color: #c9a5ff;
+            font-size: 31px;
+            font-weight: 800;
+        }
+
+        .stats-icon {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            display: grid;
+            place-items: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            color: #c49cff;
+            background: rgba(181,138,255,.12);
+            font-size: 17px;
+        }
+
+        /* GLASS PANEL */
+
+        .panel {
+            padding: 23px;
+            border: 1px solid rgba(181,138,255,.15);
+            border-radius: 17px;
+            background: linear-gradient(
+                145deg,
+                rgba(35,31,55,.88),
+                rgba(21,21,38,.93)
+            );
+            backdrop-filter: blur(20px);
+            box-shadow: 0 18px 40px rgba(0,0,0,.18);
+            animation: fadeUp .75s ease both;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 17px;
+            margin-bottom: 22px;
+        }
+
+        .panel-header h2 {
+            font-size: 16px;
+        }
+
+        .panel-header p {
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        /* SEARCH */
+
+        .search-form {
+            display: flex;
+            gap: 9px;
+            max-width: 410px;
+            width: 100%;
+        }
+
+        .search-form input {
+            flex: 1;
+            min-width: 0;
+            padding: 11px 14px;
+            outline: none;
+            border: 1px solid rgba(181,138,255,.20);
+            border-radius: 10px;
+            color: white;
+            background: rgba(12,12,28,.65);
+            font-size: 11px;
+            transition: .25s;
+        }
+
+        .search-form input::placeholder {
+            color: #77718e;
+        }
+
+        .search-form input:focus {
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 3px rgba(139,92,246,.12);
+        }
+
+        .search-form button {
+            padding: 11px 17px;
+            border: 1px solid rgba(255,255,255,.13);
+            border-radius: 10px;
+            color: white;
+            background: linear-gradient(110deg,#9333ea,#477cff);
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .25s;
+        }
+
+        .search-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(139,92,246,.35);
+        }
+
+        /* TABLE */
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid rgba(181,138,255,.10);
+            border-radius: 12px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 800px;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(139,92,246,.075);
+        }
+
+        th {
+            padding: 16px 13px;
+            border-bottom: 1px solid rgba(181,138,255,.17);
+            color: #9991b3;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-align: left;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 16px 13px;
+            border-bottom: 1px solid rgba(181,138,255,.085);
+            color: #d9d3e9;
+            font-size: 11px;
+        }
+
+        tbody tr {
+            transition: background .2s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(139,92,246,.075);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .student-name {
+            color: white;
+            font-weight: 700;
+        }
+
+        .usn {
+            color: #bd9aff;
+            font-weight: 700;
+            letter-spacing: .3px;
+        }
+
+        /* STATUS */
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 11px;
+            border: 1px solid transparent;
+            border-radius: 30px;
+            font-size: 10px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .status::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        .status.active {
+            color: var(--green);
+            border-color: rgba(92,230,165,.15);
+            background: rgba(92,230,165,.08);
+        }
+
+        .status.inactive {
+            color: var(--red);
+            border-color: rgba(255,129,151,.15);
+            background: rgba(255,129,151,.08);
+        }
+
+        /* ACTIONS */
+
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .actions form {
+            margin: 0;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 12px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .25s ease;
+            white-space: nowrap;
+        }
+
+        .view-btn {
+            color: #cbb2ff;
+            border-color: rgba(181,138,255,.22);
+            background: rgba(139,92,246,.12);
+        }
+
+        .view-btn:hover {
+            color: white;
+            border-color: #b58aff;
+            background: rgba(139,92,246,.25);
+            box-shadow: 0 0 15px rgba(139,92,246,.16);
+            transform: translateY(-2px);
+        }
+
+        .deactivate-btn {
+            color: #ff9aaa;
+            border-color: rgba(255,129,151,.20);
+            background: rgba(255,129,151,.09);
+        }
+
+        .deactivate-btn:hover {
+            background: rgba(255,129,151,.19);
+            box-shadow: 0 0 14px rgba(255,129,151,.12);
+            transform: translateY(-2px);
+        }
+
+        .activate-btn {
+            color: #76edb1;
+            border-color: rgba(92,230,165,.20);
+            background: rgba(92,230,165,.09);
+        }
+
+        .activate-btn:hover {
+            background: rgba(92,230,165,.19);
+            box-shadow: 0 0 14px rgba(92,230,165,.12);
+            transform: translateY(-2px);
+        }
+
+        /* EMPTY STATE */
+
+        .empty-state {
+            padding: 42px 15px;
+            color: #aaa5bf;
+            font-size: 12px;
+            line-height: 1.8;
+            text-align: center;
+        }
+
+        .empty-icon {
+            display: grid;
+            place-items: center;
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 14px;
+            border: 1px solid rgba(181,138,255,.23);
+            border-radius: 15px;
+            color: #c6a4ff;
+            background: rgba(139,92,246,.13);
+            font-size: 21px;
+        }
+
+        .clear-search {
+            display: inline-block;
+            margin-top: 17px;
+            color: #c19cff;
+            font-size: 11px;
+            transition: .2s;
+        }
+
+        .clear-search:hover {
+            color: white;
+            text-shadow: 0 0 12px #b58aff;
+        }
+
+        /* FOOTER */
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 24px 3px 5px;
+            color: #77718e;
+            font-size: 10px;
+        }
+
+        .footer span {
+            color: #bd9aff;
+        }
+
+        /* ANIMATION */
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 1000px) {
+            .main {
+                padding: 25px 22px;
+            }
+
+            .panel {
+                padding: 18px;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .sidebar {
+                width: 75px;
+                padding: 20px 8px;
+            }
+
+            .brand {
+                justify-content: center;
+                padding: 0 0 25px;
+            }
+
+            .brand-name,
+            .nav-label,
+            .nav-link .nav-text,
+            .profile-text {
+                display: none;
+            }
+
+            .nav-link {
+                justify-content: center;
+                padding: 12px 5px;
+            }
+
+            .nav-icon {
+                width: 31px;
+                height: 31px;
+            }
+
+            .admin-profile {
+                justify-content: center;
+                padding: 8px 3px;
+            }
+
+            .logout-btn {
+                font-size: 0;
+            }
+
+            .logout-btn .nav-icon {
+                font-size: 16px;
+            }
+
+            .main {
+                width: calc(100% - 75px);
+                margin-left: 75px;
+                padding: 23px 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-heading h1 {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+                margin-bottom: 28px;
+            }
+
+            .panel {
+                padding: 15px;
+            }
+
+            .panel-header {
+                align-items: stretch;
+            }
+
+            .search-form {
+                max-width: none;
+            }
+
+            .search-form button {
+                padding: 10px 12px;
+            }
+
+            .footer {
+                flex-direction: column;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation: none !important;
+                transition: none !important;
+            }
+
+            #neural-network {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="ambient-glow">
+    <div class="orb orb-one"></div>
+    <div class="orb orb-two"></div>
+</div>
+
+<canvas id="neural-network" aria-hidden="true"></canvas>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <a href="{{ url_for('admin_dashboard') }}" class="brand">
+
+            <div class="brand-icon">C</div>
+
+            <div class="brand-name">
+                CEC
+                <span>Lost &amp; Found</span>
+            </div>
+
+        </a>
+
+        <p class="nav-label">MAIN MENU</p>
+
+        <a href="{{ url_for('admin_dashboard') }}" class="nav-link">
+            <span class="nav-icon">⌂</span>
+            <span class="nav-text">Dashboard</span>
+        </a>
+
+        <a href="{{ url_for('admin_claims') }}" class="nav-link">
+            <span class="nav-icon">▤</span>
+            <span class="nav-text">Review Claims</span>
+        </a>
+
+        <a href="{{ url_for('admin_students') }}"
+           class="nav-link active">
+            <span class="nav-icon">♙</span>
+            <span class="nav-text">Students</span>
+        </a>
+
+        <p class="nav-label">ACCOUNT</p>
+
+        <div class="sidebar-bottom">
+
+            <div class="admin-profile">
+                <div class="profile-icon">C</div>
+
+                <div class="profile-text">
+                    <strong>Administrator</strong>
+                    <small>Admin account</small>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('logout') }}">
+
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
+                <button type="submit" class="nav-link logout-btn">
+                    <span class="nav-icon">↪</span>
+                    <span class="nav-text">Logout</span>
+                </button>
+
+            </form>
+
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <p class="breadcrumb">
+                Administration / <span>Student Management</span>
+            </p>
+
+            <div class="admin-label">
+                <span class="admin-dot"></span>
+                Administrator Access
+            </div>
+
+        </header>
+
+        <!-- PAGE HEADING -->
+
+        <section class="page-heading">
+
+            <div class="eyebrow">ADMINISTRATION / USERS</div>
+
+            <h1>
+                Student <span>Management</span>
+            </h1>
+
+            <p>
+                Manage registered student accounts, review account status
+                and access individual student information.
+            </p>
+
+        </section>
+
+        <!-- FLASH MESSAGES -->
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% for category, message in messages %}
+
+                <div class="flash-message" role="alert">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endwith %}
+
+        <!-- STATISTICS -->
+
+        <section class="stats-grid">
+
+            <div class="stats-card">
+
+                <div class="stats-icon">♙</div>
+
+                <p>Total Registered Students</p>
+
+                <div class="stats-value">
+                    {{ total_students }}
+                </div>
+
+            </div>
+
+            <div class="stats-card">
+
+                <div class="stats-icon">⌕</div>
+
+                <p>Student Directory</p>
+
+                <div class="stats-value">USN</div>
+
+            </div>
+
+        </section>
+
+        <!-- STUDENT TABLE -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <div>
+                    <h2>Registered Students</h2>
+
+                    <p>
+                        Search and manage student accounts
+                    </p>
+                </div>
+
+                <form
+                    class="search-form"
+                    method="GET"
+                    action="{{ url_for('admin_students') }}"
+                >
+
+                    <input
+                        type="text"
+                        name="search"
+                        placeholder="Search by name or USN..."
+                        value="{{ search }}"
+                    >
+
+                    <button type="submit">
+                        Search
+                    </button>
+
+                </form>
+
+            </div>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Student Name</th>
+                            <th>USN</th>
+                            <th>Account Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for student in students %}
+
+                            <tr>
+
+                                <td>{{ loop.index }}</td>
+
+                                <td class="student-name">
+                                    {{ student.full_name }}
+                                </td>
+
+                                <td class="usn">
+                                    {{ student.usn }}
+                                </td>
+
+                                <td>
+
+                                    {% if student.is_active %}
+
+                                        <span class="status active">
+                                            Active
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="status inactive">
+                                            Deactivated
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+
+                                    <div class="actions">
+
+                                        <a
+                                            href="{{ url_for('admin_student_details', student_id=student.id) }}"
+                                            class="action-btn view-btn"
+                                        >
+                                            View Details
+                                        </a>
+
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for('toggle_student_status', student_id=student.id) }}"
+                                            onsubmit="return confirm('Are you sure you want to change this student account status?');"
+                                        >
+
+                                            <input
+                                                type="hidden"
+                                                name="csrf_token"
+                                                value="{{ csrf_token() }}"
+                                            >
+
+                                            {% if student.is_active %}
+
+                                                <button
+                                                    type="submit"
+                                                    class="action-btn deactivate-btn"
+                                                >
+                                                    Deactivate
+                                                </button>
+
+                                            {% else %}
+
+                                                <button
+                                                    type="submit"
+                                                    class="action-btn activate-btn"
+                                                >
+                                                    Activate
+                                                </button>
+
+                                            {% endif %}
+
+                                        </form>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        {% else %}
+
+                            <tr>
+                                <td colspan="5" class="empty-state">
+
+                                    <div class="empty-icon">♙</div>
+
+                                    {% if search %}
+
+                                        No students found matching
+                                        "{{ search }}".
+
+                                    {% else %}
+
+                                        No students have registered yet.
+
+                                    {% endif %}
+
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% if search %}
+
+                <a
+                    href="{{ url_for('admin_students') }}"
+                    class="clear-search"
+                >
+                    ← Clear search
+                </a>
+
+            {% endif %}
+
+        </section>
+
+        <!-- FOOTER -->
+
+        <footer class="footer">
+
+            <p>
+                © 2026 CEC Lost &amp; Found. All rights reserved.
+            </p>
+
+            <p>
+                Secure <span>Administration Workspace</span>
+            </p>
+
+        </footer>
+
+    </main>
+
+</div>
+
+<!-- CUSTOM CURSOR -->
+
+<div class="cursor-glow"></div>
+<div class="custom-cursor"></div>
+
+<!-- NEURAL NETWORK ANIMATION -->
+
+<script>
+(() => {
+
+    const canvas = document.getElementById("neural-network");
+
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) return;
+
+    const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+    );
+
+    if (reducedMotion.matches) return;
+
+    let width = 0;
+    let height = 0;
+    let particles = [];
+    let animationFrame = null;
+
+    const mouse = {
+        x: 0,
+        y: 0,
+        active: false,
+        radius: 155
+    };
+
+    const maxParticles = 145;
+    const linkDistance = 145;
+
+    function random(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+
+    function createParticle() {
+
+        const angle = random(0, Math.PI * 2);
+        const speed = random(.08, .35);
+
+        return {
+            x: random(0, width),
+            y: random(0, height),
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            radius: random(1, 2.1),
+            phase: random(0, Math.PI * 2),
+            pulse: random(.008, .022),
+            color: Math.random() > .5
+                ? "185, 115, 255"
+                : "75, 135, 255"
+        };
+    }
+
+    function resize() {
+
+        const oldWidth = width || window.innerWidth;
+        const oldHeight = height || window.innerHeight;
+
+        width = window.innerWidth;
+        height = window.innerHeight;
+
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+
+        canvas.style.width = width + "px";
+        canvas.style.height = height + "px";
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        particles.forEach(p => {
+            p.x *= width / oldWidth;
+            p.y *= height / oldHeight;
+        });
+
+        const count = Math.min(
+            maxParticles,
+            Math.max(40, Math.floor(width * height / 9000))
+        );
+
+        while (particles.length < count) {
+            particles.push(createParticle());
+        }
+
+        particles.length = count;
+    }
+
+    function update() {
+
+        particles.forEach(p => {
+
+            p.phase += p.pulse;
+
+            p.x += p.vx;
+            p.y += p.vy;
+
+            if (p.x < 0 || p.x > width) p.vx *= -1;
+            if (p.y < 0 || p.y > height) p.vy *= -1;
+
+            if (mouse.active) {
+
+                const dx = p.x - mouse.x;
+                const dy = p.y - mouse.y;
+                const distance = Math.hypot(dx, dy);
+
+                if (distance > 0 && distance < mouse.radius) {
+
+                    const force =
+                        (mouse.radius - distance) / mouse.radius;
+
+                    p.x += dx / distance * force * 1.1;
+                    p.y += dy / distance * force * 1.1;
+                }
+            }
+
+            p.x = Math.max(0, Math.min(width, p.x));
+            p.y = Math.max(0, Math.min(height, p.y));
+
+        });
+    }
+
+    function drawConnections() {
+
+        for (let i = 0; i < particles.length; i++) {
+
+            for (let j = i + 1; j < particles.length; j++) {
+
+                const a = particles[i];
+                const b = particles[j];
+
+                const dx = a.x - b.x;
+                const dy = a.y - b.y;
+                const distance = Math.hypot(dx, dy);
+
+                if (distance > linkDistance) continue;
+
+                const opacity =
+                    (1 - distance / linkDistance) * .27;
+
+                ctx.beginPath();
+
+                ctx.strokeStyle =
+                    `rgba(145, 115, 255, ${opacity})`;
+
+                ctx.lineWidth = .7;
+                ctx.moveTo(a.x, a.y);
+                ctx.lineTo(b.x, b.y);
+                ctx.stroke();
+
+            }
+        }
+    }
+
+    function drawParticles() {
+
+        particles.forEach(p => {
+
+            const pulse =
+                .65 + Math.sin(p.phase) * .35;
+
+            const glow = ctx.createRadialGradient(
+                p.x, p.y, 0,
+                p.x, p.y, p.radius * 5
+            );
+
+            glow.addColorStop(
+                0,
+                `rgba(${p.color}, ${.85 * pulse})`
+            );
+
+            glow.addColorStop(
+                1,
+                `rgba(${p.color}, 0)`
+            );
+
+            ctx.beginPath();
+            ctx.fillStyle = glow;
+            ctx.arc(
+                p.x,
+                p.y,
+                p.radius * 5,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.fillStyle =
+                `rgba(238, 226, 255, ${.9 * pulse})`;
+
+            ctx.arc(
+                p.x,
+                p.y,
+                p.radius,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fill();
+
+        });
+    }
+
+    function animate() {
+
+        ctx.clearRect(0, 0, width, height);
+
+        update();
+        drawConnections();
+        drawParticles();
+
+        animationFrame = requestAnimationFrame(animate);
+    }
+
+    window.addEventListener("pointermove", event => {
+
+        if (event.pointerType === "touch") return;
+
+        mouse.x = event.clientX;
+        mouse.y = event.clientY;
+        mouse.active = true;
+
+    }, { passive: true });
+
+    window.addEventListener("pointerout", event => {
+
+        if (!event.relatedTarget) {
+            mouse.active = false;
+        }
+
+    }, { passive: true });
+
+    window.addEventListener("resize", resize, {
+        passive: true
+    });
+
+    document.addEventListener("visibilitychange", () => {
+
+        if (document.hidden && animationFrame !== null) {
+
+            cancelAnimationFrame(animationFrame);
+            animationFrame = null;
+
+        } else if (!document.hidden && animationFrame === null) {
+
+            animate();
+
+        }
+
+    });
+
+    resize();
+    animate();
+
+})();
+</script>
+
+<!-- FLASH MESSAGE AUTO DISMISS -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    document.querySelectorAll(".flash-message").forEach(message => {
+
+        setTimeout(() => {
+
+            message.classList.add("fade-out");
+
+            setTimeout(() => message.remove(), 500);
+
+        }, 4000);
+
+    });
+
+});
+</script>
+
+<!-- CUSTOM CURSOR SCRIPT -->
+
+<script src="{{ url_for('static', filename='js/cursor.js') }}?v=5"></script>
+
+</body>
+</html>

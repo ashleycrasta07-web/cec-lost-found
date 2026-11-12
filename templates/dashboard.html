@@ -1,0 +1,1932 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEC Lost &amp; Found | Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --background: #09030f;
+            --panel: rgba(35, 15, 52, .78);
+            --purple: #a72cff;
+            --pink: #f044dc;
+            --text: #f8edff;
+            --muted: #a99ab7;
+            --border: rgba(204, 102, 255, .19);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(ellipse at 55% 35%, rgba(112,20,153,.15), transparent 48%),
+                radial-gradient(ellipse at 90% 90%, rgba(83,25,155,.13), transparent 40%),
+                var(--background);
+            color: var(--text);
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* ===================================
+           ANIMATED BACKGROUND
+        =================================== */
+
+        .background-effects {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+            isolation: isolate;
+        }
+
+        #particle-network {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .background-effects::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(1px 1px at 12% 18%, #d9a1ff 1px, transparent 2px),
+                radial-gradient(1px 1px at 76% 28%, #bd75ff 1px, transparent 2px),
+                radial-gradient(1px 1px at 42% 82%, #d9a1ff 1px, transparent 2px),
+                radial-gradient(1px 1px at 88% 73%, #bd75ff 1px, transparent 2px),
+                radial-gradient(1px 1px at 25% 65%, #d9a1ff 1px, transparent 2px);
+            opacity: .4;
+            animation: starTwinkle 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes starTwinkle {
+            from { opacity: .2; }
+            to { opacity: .75; }
+        }
+
+        /* Aurora */
+
+        .aurora {
+            position: absolute;
+            width: 65vw;
+            height: 65vw;
+            min-width: 450px;
+            min-height: 450px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: .13;
+            mix-blend-mode: screen;
+            will-change: transform;
+        }
+
+        .aurora-one {
+            top: -35%;
+            left: -20%;
+            background: radial-gradient(circle, #d12aff 0%, #7621c9 35%, transparent 70%);
+            animation: auroraMoveOne 18s ease-in-out infinite alternate;
+        }
+
+        .aurora-two {
+            right: -25%;
+            bottom: -45%;
+            background: radial-gradient(circle, #693dff 0%, #b42cff 38%, transparent 70%);
+            animation: auroraMoveTwo 22s ease-in-out infinite alternate;
+        }
+
+        @keyframes auroraMoveOne {
+            0% { transform: translate(0, 0) scale(.9); }
+            50% { transform: translate(22vw, 18vh) scale(1.2); }
+            100% { transform: translate(10vw, 35vh) scale(1); }
+        }
+
+        @keyframes auroraMoveTwo {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-18vw, -15vh) scale(1.2); }
+            100% { transform: translate(-8vw, -30vh) scale(.9); }
+        }
+
+        /* Ambient lighting */
+
+        .light-orb {
+            position: absolute;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: .22;
+        }
+
+        .light-orb.one {
+            top: 10%;
+            left: 10%;
+            background: #c02aff;
+            animation: orbPulseOne 8s ease-in-out infinite alternate;
+        }
+
+        .light-orb.two {
+            right: 5%;
+            bottom: 5%;
+            background: #7045ff;
+            animation: orbPulseTwo 11s ease-in-out infinite alternate;
+        }
+
+        @keyframes orbPulseOne {
+            from {
+                transform: scale(.75) translate(0, 0);
+                opacity: .12;
+            }
+            to {
+                transform: scale(1.35) translate(70px, 35px);
+                opacity: .28;
+            }
+        }
+
+        @keyframes orbPulseTwo {
+            from {
+                transform: scale(1) translate(0, 0);
+                opacity: .12;
+            }
+            to {
+                transform: scale(1.4) translate(-55px, -45px);
+                opacity: .27;
+            }
+        }
+
+        /* Neon beams */
+
+        .light-beam {
+            position: absolute;
+            width: 45%;
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(197,66,255,.7),
+                rgba(255,83,222,.9),
+                transparent
+            );
+            box-shadow: 0 0 12px rgba(218,58,255,.45);
+            opacity: 0;
+            animation: beamTravel 12s linear infinite;
+        }
+
+        .beam-one {
+            top: 30%;
+            left: -50%;
+        }
+
+        .beam-two {
+            top: 70%;
+            left: -50%;
+            animation-delay: 6s;
+            animation-duration: 15s;
+        }
+
+        @keyframes beamTravel {
+            0% {
+                transform: translateX(-20vw) rotate(-22deg);
+                opacity: 0;
+            }
+            15% { opacity: .65; }
+            70% { opacity: .35; }
+            100% {
+                transform: translateX(170vw) rotate(-22deg);
+                opacity: 0;
+            }
+        }
+
+        /* Floating particles */
+
+        .particles {
+            position: absolute;
+            inset: 0;
+        }
+
+        .particles span {
+            position: absolute;
+            bottom: -20px;
+            left: var(--x);
+            width: var(--size);
+            height: var(--size);
+            border-radius: 50%;
+            background: #e59aff;
+            box-shadow: 0 0 6px #d95aff, 0 0 15px rgba(211,67,255,.8);
+            opacity: 0;
+            animation: particleRise var(--duration) linear infinite;
+            animation-delay: var(--delay);
+        }
+
+        .particles span:nth-child(1)  { --x:5%;  --size:3px; --duration:13s; --delay:0s; }
+        .particles span:nth-child(2)  { --x:12%; --size:2px; --duration:17s; --delay:3s; }
+        .particles span:nth-child(3)  { --x:20%; --size:4px; --duration:15s; --delay:6s; }
+        .particles span:nth-child(4)  { --x:29%; --size:2px; --duration:19s; --delay:1s; }
+        .particles span:nth-child(5)  { --x:37%; --size:3px; --duration:14s; --delay:5s; }
+        .particles span:nth-child(6)  { --x:45%; --size:2px; --duration:18s; --delay:8s; }
+        .particles span:nth-child(7)  { --x:53%; --size:4px; --duration:16s; --delay:2s; }
+        .particles span:nth-child(8)  { --x:61%; --size:2px; --duration:20s; --delay:7s; }
+        .particles span:nth-child(9)  { --x:69%; --size:3px; --duration:15s; --delay:4s; }
+        .particles span:nth-child(10) { --x:76%; --size:2px; --duration:18s; --delay:9s; }
+        .particles span:nth-child(11) { --x:83%; --size:4px; --duration:14s; --delay:2s; }
+        .particles span:nth-child(12) { --x:91%; --size:2px; --duration:19s; --delay:6s; }
+        .particles span:nth-child(13) { --x:25%; --size:3px; --duration:17s; --delay:10s; }
+        .particles span:nth-child(14) { --x:57%; --size:2px; --duration:16s; --delay:11s; }
+        .particles span:nth-child(15) { --x:96%; --size:3px; --duration:20s; --delay:4s; }
+
+        @keyframes particleRise {
+            0% {
+                transform: translate3d(0, 0, 0);
+                opacity: 0;
+            }
+            15% { opacity: .8; }
+            80% { opacity: .55; }
+            100% {
+                transform: translate3d(35px, -110vh, 0);
+                opacity: 0;
+            }
+        }
+
+        /* ===================================
+           DASHBOARD LAYOUT
+        =================================== */
+
+        .dashboard-layout {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: 220px minmax(0, 1fr) 270px;
+            gap: 20px;
+            width: min(1500px, 96%);
+            min-height: 100vh;
+            margin: auto;
+            padding: 20px 0;
+        }
+
+        .glass-panel {
+            border: 1px solid var(--border);
+            background: var(--panel);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            box-shadow:
+                0 15px 45px rgba(0,0,0,.25),
+                inset 0 1px rgba(255,255,255,.035);
+        }
+
+        /* ===================================
+           SIDEBAR
+        =================================== */
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 40px);
+            padding: 23px 15px;
+            border-radius: 22px;
+            position: sticky;
+            top: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 0 7px 25px;
+            border-bottom: 1px solid rgba(255,255,255,.07);
+        }
+
+        .brand-icon {
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
+            border-radius: 13px;
+            background: linear-gradient(135deg,#a72cff,#ed42d9);
+            box-shadow: 0 0 24px rgba(193,49,255,.45);
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        .brand-name {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: -.4px;
+        }
+
+        .brand-name span {
+            display: block;
+            margin-top: 4px;
+            color: #c783ff;
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: .7px;
+        }
+
+        .sidebar-label {
+            margin: 27px 8px 12px;
+            color: #806b91;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+        }
+
+        .nav-list {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 43px;
+            padding: 0 11px;
+            border: 1px solid transparent;
+            border-radius: 11px;
+            color: var(--muted);
+            font-size: 11px;
+            transition: .25s ease;
+        }
+
+        .nav-icon {
+            display: grid;
+            place-items: center;
+            width: 23px;
+            height: 23px;
+            border-radius: 7px;
+            background: rgba(255,255,255,.055);
+            color: #d7a0ff;
+            font-size: 14px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: white;
+            border-color: rgba(199,94,255,.25);
+            background: linear-gradient(90deg,rgba(165,43,255,.22),rgba(225,52,214,.08));
+            box-shadow: inset 2px 0 #c54cff, 0 0 18px rgba(171,49,255,.08);
+        }
+
+        .nav-link.active .nav-icon,
+        .nav-link:hover .nav-icon {
+            background: linear-gradient(135deg,#a72cff,#e943d9);
+            color: white;
+            box-shadow: 0 0 13px rgba(207,58,255,.4);
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            padding-top: 20px;
+        }
+
+        .sidebar-note {
+            padding: 15px 12px;
+            border: 1px solid rgba(194,91,255,.17);
+            border-radius: 13px;
+            background: rgba(135,42,180,.10);
+        }
+
+        .sidebar-note strong {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 11px;
+        }
+
+        .sidebar-note p {
+            color: var(--muted);
+            font-size: 10px;
+            line-height: 1.7;
+        }
+
+        .logout-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    color: #ff9aaf;
+    font-family: inherit;
+    font-size: 11px;
+    text-align: left;
+    cursor: pointer;
+    transition: .25s ease;
+}
+
+.logout-link:hover {
+    border-color: rgba(255, 100, 150, .25);
+    background: rgba(255, 65, 120, .10);
+    box-shadow: 0 0 16px rgba(255, 65, 120, .15);
+}
+
+.logout-link {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+            background: rgba(255,65,120,.10);
+            box-shadow: 0 0 16px rgba(255,65,120,.10);
+        }
+
+        /* ===================================
+           MAIN CONTENT
+        =================================== */
+
+        .main-content {
+            min-width: 0;
+            padding: 4px 0;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 23px;
+        }
+
+        .page-heading small {
+            color: #c17bff;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .page-heading h1 {
+            margin-top: 7px;
+            font-size: 22px;
+            letter-spacing: -.7px;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon-button {
+            display: grid;
+            place-items: center;
+            width: 39px;
+            height: 39px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(39,19,56,.8);
+            color: #e7c2ff;
+            font-size: 17px;
+            transition: .25s;
+        }
+
+        .icon-button:hover {
+            border-color: var(--pink);
+            box-shadow: 0 0 17px rgba(240,68,220,.25);
+            transform: translateY(-2px);
+        }
+
+        .profile-chip {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 5px 12px 5px 6px;
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            background: rgba(39,19,56,.8);
+        }
+
+        .avatar {
+            display: grid;
+            place-items: center;
+            width: 29px;
+            height: 29px;
+            border-radius: 50%;
+            background: linear-gradient(135deg,#a72cff,#f044dc);
+            color: white;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .profile-chip span {
+            max-width: 105px;
+            overflow: hidden;
+            color: #e9d9f7;
+            font-size: 10px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Welcome */
+
+        .welcome-panel {
+            position: relative;
+            overflow: hidden;
+            padding: 28px;
+            border: 1px solid rgba(209,91,255,.35);
+            border-radius: 19px;
+            background: linear-gradient(
+                115deg,
+                rgba(104,31,141,.48),
+                rgba(43,20,79,.76) 60%,
+                rgba(37,24,83,.65)
+            );
+            box-shadow:
+                0 0 30px rgba(174,48,255,.09),
+                inset 0 1px rgba(255,255,255,.08);
+        }
+
+        .welcome-panel::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            right: -55px;
+            top: -80px;
+            border: 1px solid rgba(240,93,255,.35);
+            border-radius: 50%;
+            box-shadow: 0 0 50px rgba(222,54,255,.20);
+        }
+
+        .welcome-tag {
+            color: #e6aaff;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+        }
+
+        .welcome-panel h2 {
+            position: relative;
+            z-index: 1;
+            margin-top: 13px;
+            font-size: clamp(24px,3vw,34px);
+            line-height: 1.2;
+            letter-spacing: -1px;
+        }
+
+        .welcome-panel h2 span {
+            color: #ed9cff;
+            text-shadow: 0 0 18px rgba(235,94,255,.45);
+        }
+
+        .welcome-panel p {
+            position: relative;
+            z-index: 1;
+            max-width: 470px;
+            margin-top: 12px;
+            color: #c6b4d3;
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        /* Flash messages */
+
+        .flash-container {
+            margin-top: 15px;
+        }
+
+        .flash-message {
+            margin-bottom: 8px;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: rgba(53,24,72,.9);
+            color: #f6e8ff;
+            font-size: 12px;
+            transition: opacity .4s, transform .4s;
+        }
+
+        .flash-message.fade-out {
+            opacity: 0;
+            transform: translateY(-5px);
+        }
+
+        /* Section heading */
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 12px;
+            margin: 29px 0 15px;
+        }
+
+        .section-heading h2 {
+            font-size: 16px;
+        }
+
+        .section-heading p {
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .section-heading span {
+            color: #d48aff;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        /* Action cards */
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2,minmax(0,1fr));
+            gap: 13px;
+        }
+
+        .action-card {
+            position: relative;
+            display: block;
+            min-height: 158px;
+            overflow: hidden;
+            padding: 17px;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            background: linear-gradient(
+                145deg,
+                rgba(57,26,78,.76),
+                rgba(24,15,42,.86)
+            );
+            box-shadow: 0 9px 28px rgba(0,0,0,.16);
+            transition: .28s ease;
+        }
+
+        .action-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                120deg,
+                transparent 30%,
+                rgba(237,86,255,.10),
+                transparent 70%
+            );
+            opacity: 0;
+            transition: .3s;
+        }
+
+        .action-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(231,91,255,.65);
+            box-shadow:
+                0 0 24px rgba(193,54,255,.19),
+                0 12px 28px rgba(0,0,0,.25);
+        }
+
+        .action-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-top {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .card-icon {
+            display: grid;
+            place-items: center;
+            width: 37px;
+            height: 37px;
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 11px;
+            background: linear-gradient(135deg,#9d2bdf,#e63dc9);
+            box-shadow: 0 0 16px rgba(203,56,255,.23);
+            color: white;
+            font-size: 17px;
+        }
+
+        .card-arrow {
+            color: #a78bb7;
+            font-size: 17px;
+            transition: .25s;
+        }
+
+        .action-card:hover .card-arrow {
+            color: #f18aff;
+            transform: translate(3px,-3px);
+        }
+
+        .action-card h3 {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 7px;
+            font-size: 12px;
+        }
+
+        .action-card p {
+            position: relative;
+            z-index: 1;
+            color: var(--muted);
+            font-size: 10px;
+            line-height: 1.7;
+        }
+
+        .card-action {
+            position: relative;
+            z-index: 1;
+            display: inline-block;
+            margin-top: 11px;
+            color: #e68aff;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        /* ===================================
+           RIGHT PANEL
+        =================================== */
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 17px;
+            padding-top: 4px;
+        }
+
+        .right-card {
+            padding: 19px 16px;
+            border-radius: 17px;
+        }
+
+        .right-card h3 {
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .right-card .subheading {
+            margin-bottom: 17px;
+            color: var(--muted);
+            font-size: 10px;
+            line-height: 1.6;
+        }
+
+        .account-avatar {
+            display: grid;
+            place-items: center;
+            width: 61px;
+            height: 61px;
+            margin: 5px auto 14px;
+            border: 2px solid rgba(230,108,255,.6);
+            border-radius: 50%;
+            background: linear-gradient(135deg,#9d2bdf,#ed43d4);
+            box-shadow: 0 0 25px rgba(202,61,255,.30);
+            font-size: 23px;
+            font-weight: 800;
+        }
+
+        .account-name {
+            text-align: center;
+            font-size: 13px;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .account-usn {
+            margin-top: 6px;
+            color: #b89bc9;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        .account-status {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 7px;
+            margin-top: 15px;
+            padding: 9px;
+            border: 1px solid rgba(65,224,157,.18);
+            border-radius: 9px;
+            background: rgba(41,197,133,.07);
+            color: #8de9bf;
+            font-size: 10px;
+        }
+
+        .account-status::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #4ae4a1;
+            box-shadow: 0 0 9px #4ae4a1;
+        }
+
+        /* Quick access */
+
+        .quick-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 0;
+            border-top: 1px solid rgba(255,255,255,.06);
+            color: #c8b6d5;
+            font-size: 10px;
+            transition: .2s;
+        }
+
+        .quick-link:first-of-type {
+            border-top: 0;
+        }
+
+        .quick-link:hover {
+            color: #ed9aff;
+            padding-left: 4px;
+        }
+
+        .quick-icon {
+            display: grid;
+            place-items: center;
+            width: 27px;
+            height: 27px;
+            border-radius: 8px;
+            background: rgba(181,68,232,.15);
+            color: #df9aff;
+            font-size: 13px;
+        }
+
+        .quick-arrow {
+            margin-left: auto;
+            color: #947aa5;
+        }
+
+        /* Help panel */
+
+        .help-panel {
+            padding: 17px;
+            border: 1px solid rgba(208,91,255,.24);
+            border-radius: 15px;
+            background: linear-gradient(
+                145deg,
+                rgba(116,35,153,.20),
+                rgba(45,24,85,.35)
+            );
+        }
+
+        .help-panel .help-icon {
+            margin-bottom: 10px;
+            color: #e18cff;
+            font-size: 20px;
+        }
+
+        .help-panel h3 {
+            margin-bottom: 7px;
+            font-size: 12px;
+        }
+
+        .help-panel p {
+            color: var(--muted);
+            font-size: 10px;
+            line-height: 1.7;
+        }
+
+        /* Footer */
+
+        .footer {
+            margin-top: auto;
+            padding-top: 20px;
+            color: #776582;
+            text-align: center;
+            font-size: 9px;
+            line-height: 1.8;
+        }
+
+        a:focus-visible {
+            outline: 2px solid #ed83ff;
+            outline-offset: 4px;
+        }
+
+        /* ===================================
+           RESPONSIVE DESIGN
+        =================================== */
+
+        @media (max-width: 1100px) {
+            .dashboard-layout {
+                grid-template-columns: 190px minmax(0,1fr);
+            }
+
+            .right-panel {
+                grid-column: 2;
+                display: grid;
+                grid-template-columns: repeat(2,minmax(0,1fr));
+            }
+
+            .right-panel .help-panel {
+                grid-column: 1 / -1;
+            }
+
+            .sidebar {
+                grid-row: 1 / span 2;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .dashboard-layout {
+                display: flex;
+                flex-direction: column;
+                width: 92%;
+                gap: 17px;
+                padding: 12px 0 25px;
+            }
+
+            .sidebar {
+                position: static;
+                height: auto;
+                min-height: 0;
+                padding: 13px;
+            }
+
+            .brand {
+                padding-bottom: 12px;
+            }
+
+            .sidebar-label {
+                margin: 13px 7px 8px;
+            }
+
+            .nav-list {
+                display: grid;
+                grid-template-columns: repeat(2,minmax(0,1fr));
+                gap: 5px;
+            }
+
+            .nav-link {
+                min-height: 38px;
+                padding: 0 7px;
+                font-size: 10px;
+            }
+
+            .sidebar-bottom {
+                padding-top: 8px;
+            }
+
+            .sidebar-note {
+                display: none;
+            }
+
+            .logout-link {
+                margin-top: 5px;
+                padding: 8px;
+            }
+
+            .main-content {
+                padding: 0;
+            }
+
+            .right-panel {
+                display: grid;
+                grid-template-columns: repeat(2,minmax(0,1fr));
+            }
+
+            .right-panel .help-panel {
+                grid-column: 1 / -1;
+            }
+
+            .welcome-panel {
+                padding: 24px 20px;
+            }
+
+            .topbar {
+                margin-bottom: 15px;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .action-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-card {
+                min-height: 145px;
+            }
+
+            .right-panel {
+                grid-template-columns: 1fr;
+            }
+
+            .right-panel .help-panel {
+                grid-column: auto;
+            }
+
+            .profile-chip span {
+                max-width: 72px;
+            }
+
+            .page-heading h1 {
+                font-size: 18px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+                scroll-behavior: auto !important;
+            }
+
+            #particle-network {
+                display: none;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- ===================================
+         ANIMATED BACKGROUND
+    =================================== -->
+
+    <div class="background-effects">
+
+        <div class="aurora aurora-one"></div>
+        <div class="aurora aurora-two"></div>
+
+        <div class="light-orb one"></div>
+        <div class="light-orb two"></div>
+
+        <div class="light-beam beam-one"></div>
+        <div class="light-beam beam-two"></div>
+
+        <div class="particles">
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+        </div>
+
+    </div>
+
+    <!-- Interactive particle canvas -->
+    <canvas id="particle-network" aria-hidden="true"></canvas>
+
+    <!-- Custom cursor -->
+    <div class="cursor-glow"></div>
+    <div class="custom-cursor"></div>
+    <div class="cursor-trail"></div>
+
+    <!-- ===================================
+         DASHBOARD LAYOUT
+    =================================== -->
+
+    <div class="dashboard-layout">
+
+        <!-- LEFT SIDEBAR -->
+
+        <aside class="sidebar glass-panel">
+
+            <div class="brand">
+                <div class="brand-icon">C</div>
+
+                <div class="brand-name">
+                    CEC LOST &amp; FOUND
+                    <span>STUDENT PORTAL</span>
+                </div>
+            </div>
+
+            <div class="sidebar-label">Workspace</div>
+
+            <nav class="nav-list" aria-label="Dashboard navigation">
+
+                <a href="#dashboard" class="nav-link active">
+                    <span class="nav-icon">⌂</span>
+                    Dashboard
+                </a>
+
+                <a href="{{ url_for('browse_items') }}" class="nav-link">
+                    <span class="nav-icon">⌕</span>
+                    Browse Items
+                </a>
+
+                <a href="{{ url_for('report_item', report_type='lost') }}" class="nav-link">
+                    <span class="nav-icon">↗</span>
+                    Report Lost
+                </a>
+
+                <a href="{{ url_for('report_item', report_type='found') }}" class="nav-link">
+                    <span class="nav-icon">✦</span>
+                    Report Found
+                </a>
+
+            </nav>
+
+            <div class="sidebar-label">My Activity</div>
+
+            <nav class="nav-list" aria-label="My activity">
+
+                <a href="{{ url_for('my_reports') }}" class="nav-link">
+                    <span class="nav-icon">▤</span>
+                    My Reports
+                </a>
+
+                <a href="{{ url_for('my_claims') }}" class="nav-link">
+                    <span class="nav-icon">✓</span>
+                    My Claims
+                </a>
+
+                <a href="{{ url_for('notifications') }}" class="nav-link">
+                    <span class="nav-icon">♧</span>
+                    Notifications
+                </a>
+
+            </nav>
+
+            <div class="sidebar-bottom">
+
+                <div class="sidebar-note">
+                    <strong>Campus Community</strong>
+                    <p>
+                        Every report helps the CEC community
+                        reconnect people with their belongings.
+                    </p>
+                </div>
+
+               <form method="POST" action="{{ url_for('logout') }}" class="logout-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="logout-link">
+        <span>↗</span>
+        Sign Out
+    </button>
+</form>
+            </div>
+
+        </aside>
+
+        <!-- CENTER WORKSPACE -->
+
+        <main class="main-content" id="dashboard">
+
+            <header class="topbar">
+
+                <div class="page-heading">
+                    <small>CEC / Workspace</small>
+                    <h1>Dashboard</h1>
+                </div>
+
+                <div class="top-actions">
+
+                    <a href="{{ url_for('notifications') }}"
+                       class="icon-button"
+                       title="Notifications"
+                       aria-label="Notifications">
+                        ♧
+                    </a>
+
+                    <div class="profile-chip">
+
+                        <div class="avatar">
+                            {{ user.full_name[0] | upper }}
+                        </div>
+
+                        <span>{{ user.full_name }}</span>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+            <!-- WELCOME PANEL -->
+
+            <section class="welcome-panel">
+
+                <div class="welcome-tag">Student workspace</div>
+
+                <h2>
+                    Welcome back,<br>
+                    <span>{{ user.full_name }}.</span>
+                </h2>
+
+                <p>
+                    Your campus lost and found space.
+                    Report misplaced belongings, help others recover
+                    their items, and keep track of your activity.
+                </p>
+
+            </section>
+
+            <!-- FLASH MESSAGES -->
+
+            <div class="flash-container">
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+
+                    {% for category, message in messages %}
+
+                        <div class="flash-message {{ category }}">
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                {% endwith %}
+
+            </div>
+
+            <!-- QUICK ACTIONS -->
+
+            <section>
+
+                <div class="section-heading">
+
+                    <div>
+                        <h2>Quick Actions</h2>
+                        <p>Choose what you want to do today.</p>
+                    </div>
+
+                    <span>YOUR WORKSPACE</span>
+
+                </div>
+
+                <div class="action-grid">
+
+                    <!-- Report lost -->
+
+                    <a href="{{ url_for('report_item', report_type='lost') }}"
+                       class="action-card">
+
+                        <div class="card-top">
+                            <div class="card-icon">⌕</div>
+                            <span class="card-arrow">↗</span>
+                        </div>
+
+                        <h3>Report a Lost Item</h3>
+
+                        <p>
+                            Report something you misplaced
+                            on the college campus.
+                        </p>
+
+                        <span class="card-action">Create report →</span>
+
+                    </a>
+
+                    <!-- Report found -->
+
+                    <a href="{{ url_for('report_item', report_type='found') }}"
+                       class="action-card">
+
+                        <div class="card-top">
+                            <div class="card-icon">✦</div>
+                            <span class="card-arrow">↗</span>
+                        </div>
+
+                        <h3>Report a Found Item</h3>
+
+                        <p>
+                            Help another student by reporting
+                            an item you discovered.
+                        </p>
+
+                        <span class="card-action">Create report →</span>
+
+                    </a>
+
+                    <!-- Browse items -->
+
+                    <a href="{{ url_for('browse_items') }}"
+                       class="action-card">
+
+                        <div class="card-top">
+                            <div class="card-icon">⌕</div>
+                            <span class="card-arrow">↗</span>
+                        </div>
+
+                        <h3>Browse Items</h3>
+
+                        <p>
+                            Explore the available lost and found
+                            item reports.
+                        </p>
+
+                        <span class="card-action">Explore items →</span>
+
+                    </a>
+
+                    <!-- My reports -->
+
+                    <a href="{{ url_for('my_reports') }}"
+                       class="action-card">
+
+                        <div class="card-top">
+                            <div class="card-icon">▤</div>
+                            <span class="card-arrow">↗</span>
+                        </div>
+
+                        <h3>My Reports</h3>
+
+                        <p>
+                            Access and manage the reports
+                            you have submitted.
+                        </p>
+
+                        <span class="card-action">View reports →</span>
+
+                    </a>
+
+                    <!-- My claims -->
+
+                    <a href="{{ url_for('my_claims') }}"
+                       class="action-card">
+
+                        <div class="card-top">
+                            <div class="card-icon">✓</div>
+                            <span class="card-arrow">↗</span>
+                        </div>
+
+                        <h3>My Claims</h3>
+
+                        <p>
+                            Review your claims and check
+                            their current status.
+                        </p>
+
+                        <span class="card-action">View claims →</span>
+
+                    </a>
+
+                </div>
+
+            </section>
+
+            <footer class="footer">
+                CEC Lost &amp; Found Portal<br>
+                Connecting people with their belongings.
+            </footer>
+
+        </main>
+
+        <!-- RIGHT PANEL -->
+
+        <aside class="right-panel">
+
+            <!-- ACCOUNT -->
+
+            <section class="right-card glass-panel">
+
+                <h3>Your Account</h3>
+                <p class="subheading">Student profile information</p>
+
+                <div class="account-avatar">
+                    {{ user.full_name[0] | upper }}
+                </div>
+
+                <div class="account-name">
+                    {{ user.full_name }}
+                </div>
+
+                <div class="account-usn">
+                    USN: {{ user.usn }}
+                </div>
+
+                <div class="account-status">
+                    Student account
+                </div>
+
+            </section>
+
+            <!-- QUICK ACCESS -->
+
+            <section class="right-card glass-panel">
+
+                <h3>Quick Access</h3>
+                <p class="subheading">Go directly to your activity</p>
+
+                <a href="{{ url_for('my_reports') }}" class="quick-link">
+                    <span class="quick-icon">▤</span>
+                    My submitted reports
+                    <span class="quick-arrow">›</span>
+                </a>
+
+                <a href="{{ url_for('my_claims') }}" class="quick-link">
+                    <span class="quick-icon">✓</span>
+                    My submitted claims
+                    <span class="quick-arrow">›</span>
+                </a>
+
+                <a href="{{ url_for('notifications') }}" class="quick-link">
+                    <span class="quick-icon">♧</span>
+                    Notifications
+                    <span class="quick-arrow">›</span>
+                </a>
+
+            </section>
+
+            <!-- HELP -->
+
+            <section class="help-panel">
+
+                <div class="help-icon">✧</div>
+
+                <h3>Lost Something?</h3>
+
+                <p>
+                    Start by browsing the existing reports.
+                    If you cannot find your item, submit a
+                    lost item report to notify the community.
+                </p>
+
+            </section>
+
+        </aside>
+
+    </div>
+
+    <!-- ===================================
+         FLASH MESSAGE SCRIPT
+    =================================== -->
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const messages =
+                document.querySelectorAll(".flash-message");
+
+            messages.forEach(function (message) {
+
+                setTimeout(function () {
+
+                    message.classList.add("fade-out");
+
+                    setTimeout(function () {
+                        message.remove();
+                    }, 450);
+
+                }, 4000);
+
+            });
+
+        });
+    </script>
+
+    <!-- ===================================
+         INTERACTIVE PARTICLE NETWORK
+    =================================== -->
+
+    <script>
+    (() => {
+
+        const canvas = document.getElementById("particle-network");
+
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d");
+
+        if (!ctx) return;
+
+        const reducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        );
+
+        if (reducedMotion.matches) return;
+
+        let width = 0;
+        let height = 0;
+        let particles = [];
+        let animationId = null;
+
+        const mouse = {
+            x: 0,
+            y: 0,
+            radius: 170,
+            active: false
+        };
+
+        const settings = {
+            density: 8500,
+            maxParticles: 150,
+            connectionDistance: 145,
+            speed: 0.38,
+            mouseForce: 2.8
+        };
+
+        function random(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        // Create a new particle
+
+        function createParticle() {
+
+            const angle = random(0, Math.PI * 2);
+            const speed = random(0.15, settings.speed);
+
+            return {
+                x: random(0, width),
+                y: random(0, height),
+
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+
+                radius: random(1.1, 2.5),
+                alpha: random(0.35, 0.9),
+
+                color: Math.random() > 0.5
+                    ? "190, 75, 255"
+                    : "255, 76, 220",
+
+                phase: random(0, Math.PI * 2),
+                pulseSpeed: random(0.008, 0.025)
+            };
+        }
+
+        // Resize canvas
+
+        function resizeCanvas() {
+
+            const oldWidth = width;
+            const oldHeight = height;
+
+            width = window.innerWidth;
+            height = window.innerHeight;
+
+            const dpr = Math.min(
+                window.devicePixelRatio || 1,
+                2
+            );
+
+            canvas.width = Math.round(width * dpr);
+            canvas.height = Math.round(height * dpr);
+
+            canvas.style.width = width + "px";
+            canvas.style.height = height + "px";
+
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            const desiredCount = Math.min(
+                settings.maxParticles,
+                Math.max(
+                    35,
+                    Math.floor((width * height) / settings.density)
+                )
+            );
+
+            if (particles.length > 0 && oldWidth && oldHeight) {
+
+                const scaleX = width / oldWidth;
+                const scaleY = height / oldHeight;
+
+                particles.forEach(p => {
+                    p.x *= scaleX;
+                    p.y *= scaleY;
+                });
+
+            }
+
+            while (particles.length < desiredCount) {
+                particles.push(createParticle());
+            }
+
+            if (particles.length > desiredCount) {
+                particles.length = desiredCount;
+            }
+
+        }
+
+        // Move particles
+
+        function updateParticles() {
+
+            particles.forEach(p => {
+
+                p.phase += p.pulseSpeed;
+
+                p.x += p.vx;
+                p.y += p.vy;
+
+                // Mouse repulsion
+
+                if (mouse.active) {
+
+                    const dx = p.x - mouse.x;
+                    const dy = p.y - mouse.y;
+
+                    const distance = Math.sqrt(
+                        dx * dx + dy * dy
+                    );
+
+                    if (distance < mouse.radius && distance > 0) {
+
+                        const force =
+                            (mouse.radius - distance) / mouse.radius;
+
+                        const push = force * settings.mouseForce;
+
+                        p.x += (dx / distance) * push;
+                        p.y += (dy / distance) * push;
+
+                    }
+
+                }
+
+                // Screen boundaries
+
+                if (p.x < 0) {
+                    p.x = 0;
+                    p.vx *= -1;
+                }
+
+                if (p.x > width) {
+                    p.x = width;
+                    p.vx *= -1;
+                }
+
+                if (p.y < 0) {
+                    p.y = 0;
+                    p.vy *= -1;
+                }
+
+                if (p.y > height) {
+                    p.y = height;
+                    p.vy *= -1;
+                }
+
+            });
+
+        }
+
+        // Draw glowing particles
+
+        function drawParticles() {
+
+            particles.forEach(p => {
+
+                const pulse = 0.65 + Math.sin(p.phase) * 0.35;
+                const glowRadius = p.radius * 5;
+
+                const glow = ctx.createRadialGradient(
+                    p.x, p.y, 0,
+                    p.x, p.y, glowRadius
+                );
+
+                glow.addColorStop(
+                    0,
+                    `rgba(${p.color}, ${p.alpha * pulse})`
+                );
+
+                glow.addColorStop(
+                    1,
+                    `rgba(${p.color}, 0)`
+                );
+
+                ctx.beginPath();
+                ctx.fillStyle = glow;
+
+                ctx.arc(
+                    p.x,
+                    p.y,
+                    glowRadius,
+                    0,
+                    Math.PI * 2
+                );
+
+                ctx.fill();
+
+                // Bright centre
+
+                ctx.beginPath();
+
+                ctx.fillStyle =
+                    `rgba(255,220,255,${p.alpha * pulse})`;
+
+                ctx.arc(
+                    p.x,
+                    p.y,
+                    p.radius,
+                    0,
+                    Math.PI * 2
+                );
+
+                ctx.fill();
+
+            });
+
+        }
+
+        // Connect nearby particles
+
+        function drawConnections() {
+
+            for (let i = 0; i < particles.length; i++) {
+
+                for (let j = i + 1; j < particles.length; j++) {
+
+                    const p1 = particles[i];
+                    const p2 = particles[j];
+
+                    const dx = p1.x - p2.x;
+                    const dy = p1.y - p2.y;
+
+                    const distanceSquared = dx * dx + dy * dy;
+
+                    const maxDistanceSquared =
+                        settings.connectionDistance ** 2;
+
+                    if (distanceSquared < maxDistanceSquared) {
+
+                        const distance = Math.sqrt(distanceSquared);
+
+                        const opacity =
+                            (1 - distance / settings.connectionDistance) * .32;
+
+                        const gradient = ctx.createLinearGradient(
+                            p1.x, p1.y,
+                            p2.x, p2.y
+                        );
+
+                        gradient.addColorStop(
+                            0,
+                            `rgba(190,75,255,${opacity})`
+                        );
+
+                        gradient.addColorStop(
+                            1,
+                            `rgba(255,76,220,${opacity})`
+                        );
+
+                        ctx.beginPath();
+                        ctx.strokeStyle = gradient;
+                        ctx.lineWidth = .65;
+
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+
+                        ctx.stroke();
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        // Mouse energy field
+
+        function drawMouseEnergy() {
+
+            if (!mouse.active) return;
+
+            const energy = ctx.createRadialGradient(
+                mouse.x,
+                mouse.y,
+                0,
+                mouse.x,
+                mouse.y,
+                mouse.radius
+            );
+
+            energy.addColorStop(
+                0,
+                "rgba(190,65,255,.09)"
+            );
+
+            energy.addColorStop(
+                .45,
+                "rgba(225,55,255,.035)"
+            );
+
+            energy.addColorStop(
+                1,
+                "rgba(225,55,255,0)"
+            );
+
+            ctx.beginPath();
+
+            ctx.fillStyle = energy;
+
+            ctx.arc(
+                mouse.x,
+                mouse.y,
+                mouse.radius,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fill();
+
+        }
+
+        // Main animation loop
+
+        function animate() {
+
+            ctx.clearRect(0, 0, width, height);
+
+            updateParticles();
+
+            drawConnections();
+
+            drawParticles();
+
+            drawMouseEnergy();
+
+            animationId = requestAnimationFrame(animate);
+
+        }
+
+        // Mouse movement
+
+        window.addEventListener("pointermove", function(event) {
+
+            if (event.pointerType === "touch") return;
+
+            mouse.x = event.clientX;
+            mouse.y = event.clientY;
+            mouse.active = true;
+
+        }, { passive: true });
+
+        window.addEventListener("pointerout", function(event) {
+
+            if (!event.relatedTarget) {
+                mouse.active = false;
+            }
+
+        }, { passive: true });
+
+        window.addEventListener("pointerdown", function(event) {
+
+            if (event.pointerType === "touch") return;
+
+            mouse.x = event.clientX;
+            mouse.y = event.clientY;
+            mouse.active = true;
+
+        }, { passive: true });
+
+        // Resize handling
+
+        window.addEventListener("resize", resizeCanvas, {
+            passive: true
+        });
+
+        // Pause when tab is hidden
+
+        document.addEventListener("visibilitychange", function() {
+
+            if (document.hidden) {
+
+                if (animationId !== null) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+
+            } else if (animationId === null) {
+
+                animate();
+
+            }
+
+        });
+
+        // Initialize
+
+        resizeCanvas();
+        animate();
+
+    })();
+    </script>
+
+    <!-- EXISTING CUSTOM CURSOR SCRIPT -->
+
+    <script src="{{ url_for('static', filename='js/cursor.js') }}"></script>
+
+</body>
+</html>

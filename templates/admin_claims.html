@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Claims | CEC Lost &amp; Found</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0b0a17;
+            --purple: #b58aff;
+            --purple-light: #d1a8ff;
+            --blue: #438cff;
+            --green: #5ce6a5;
+            --orange: #ffbd75;
+            --red: #ff7c91;
+            --text: #f5f2ff;
+            --muted: #aaa5bf;
+            --border: rgba(255,255,255,.09);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 0;
+            color: var(--text);
+            background:
+                radial-gradient(ellipse at 12% 15%, rgba(137,55,255,.19), transparent 37%),
+                radial-gradient(ellipse at 90% 85%, rgba(35,105,255,.16), transparent 38%),
+                var(--bg);
+            font-family: Inter, Arial, sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        /* NEURAL NETWORK BACKGROUND */
+
+        #neural-network {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .background-glow {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .ambient-orb {
+            position: absolute;
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: .16;
+            animation: orbFloat 12s ease-in-out infinite alternate;
+        }
+
+        .orb-one {
+            top: 8%;
+            left: -100px;
+            background: #a855f7;
+        }
+
+        .orb-two {
+            right: -100px;
+            bottom: 8%;
+            background: #287dff;
+            animation-delay: -5s;
+        }
+
+        @keyframes orbFloat {
+            from { transform: translate(0,0); }
+            to { transform: translate(55px,-35px); }
+        }
+
+        /* PAGE CONTAINER */
+
+        .container {
+            position: relative;
+            z-index: 2;
+            width: min(1100px,90%);
+            margin: 0 auto;
+            padding: 28px 0 60px;
+        }
+
+        /* TOP NAVIGATION */
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 48px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -.5px;
+        }
+
+        .brand-icon {
+            display: grid;
+            place-items: center;
+            width: 39px;
+            height: 39px;
+            border-radius: 12px;
+            background: linear-gradient(135deg,#a855f7,#4f46e5,#3187ff);
+            box-shadow: 0 0 22px rgba(139,92,246,.4),
+                        inset 0 1px rgba(255,255,255,.35);
+        }
+
+        .brand span {
+            background: linear-gradient(90deg,#d4a5ff,#8d9dff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 11px 17px;
+            border: 1px solid rgba(174,130,255,.25);
+            border-radius: 11px;
+            color: #ded2ff;
+            background: rgba(255,255,255,.045);
+            backdrop-filter: blur(12px);
+            transition: .25s ease;
+            font-size: 13px;
+        }
+
+        .back-btn:hover {
+            border-color: rgba(185,140,255,.7);
+            background: rgba(139,92,246,.15);
+            box-shadow: 0 0 22px rgba(139,92,246,.18);
+            transform: translateY(-2px);
+        }
+
+        /* PAGE HEADING */
+
+        .heading {
+            margin-bottom: 30px;
+            animation: fadeUp .7s ease both;
+        }
+
+        .heading small {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            color: #bd9aff;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .heading small::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #b58aff;
+            box-shadow: 0 0 12px #b58aff;
+        }
+
+        .heading h1 {
+            margin: 12px 0;
+            font-size: clamp(30px,5vw,40px);
+            letter-spacing: -1px;
+        }
+
+        .heading h1 span {
+            color: #bd9aff;
+            text-shadow: 0 0 25px rgba(181,138,255,.22);
+        }
+
+        .heading p {
+            max-width: 650px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        /* FLASH MESSAGES */
+
+        .flash {
+            position: relative;
+            padding: 14px 18px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(30,27,49,.8);
+            backdrop-filter: blur(15px);
+            font-size: 13px;
+            transition: opacity .5s ease, transform .5s ease;
+        }
+
+        .flash.success {
+            color: var(--green);
+            border-color: rgba(92,230,165,.25);
+            box-shadow: 0 0 18px rgba(92,230,165,.06);
+        }
+
+        .flash.error {
+            color: var(--red);
+            border-color: rgba(255,135,153,.25);
+            box-shadow: 0 0 18px rgba(255,135,153,.06);
+        }
+
+        .flash.fade-out {
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+        }
+
+        /* CLAIMS LIST */
+
+        .claims-list {
+            display: grid;
+            gap: 22px;
+        }
+
+        /* HOLOGRAPHIC GLASS CLAIM CARD */
+
+        .claim-card {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            padding: 26px;
+            border: 1px solid rgba(166,120,255,.30);
+            border-radius: 20px;
+            background:
+                linear-gradient(115deg,rgba(132,74,220,.10),transparent 38%),
+                radial-gradient(ellipse at 100% 0%,rgba(73,125,255,.12),transparent 42%),
+                linear-gradient(145deg,rgba(37,31,61,.91),rgba(17,19,39,.94));
+            backdrop-filter: blur(22px) saturate(145%);
+            -webkit-backdrop-filter: blur(22px) saturate(145%);
+            box-shadow:
+                0 22px 55px rgba(0,0,0,.28),
+                0 0 0 1px rgba(255,255,255,.025),
+                inset 0 1px 0 rgba(255,255,255,.10);
+            transition: transform .3s ease,
+                        border-color .3s ease,
+                        box-shadow .3s ease;
+            animation: fadeUp .65s ease both;
+        }
+
+        .claim-card::before {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            top: -100px;
+            right: -90px;
+            width: 230px;
+            height: 230px;
+            border-radius: 50%;
+            background: rgba(153,92,255,.13);
+            filter: blur(75px);
+            pointer-events: none;
+        }
+
+        .claim-card::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 7%;
+            right: 7%;
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(205,170,255,.75),
+                rgba(103,157,255,.55),
+                transparent
+            );
+            opacity: .8;
+            pointer-events: none;
+        }
+
+        .claim-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(184,145,255,.62);
+            box-shadow:
+                0 28px 65px rgba(0,0,0,.34),
+                0 0 32px rgba(139,92,246,.16),
+                inset 0 1px 0 rgba(255,255,255,.13);
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* CLAIM HEADER */
+
+        .claim-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 23px;
+        }
+
+        .claim-number {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 12px;
+            border: 1px solid rgba(174,130,255,.18);
+            border-radius: 999px;
+            color: #c7b4ed;
+            background: rgba(132,91,210,.09);
+            font-size: 12px;
+            letter-spacing: .25px;
+        }
+
+        /* STATUS BADGES */
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 13px;
+            border: 1px solid transparent;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .status::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 9px currentColor;
+        }
+
+        .status.pending {
+            color: var(--orange);
+            background: rgba(255,189,117,.09);
+            border-color: rgba(255,189,117,.17);
+        }
+
+        .status.approved {
+            color: var(--green);
+            background: rgba(92,230,165,.09);
+            border-color: rgba(92,230,165,.17);
+        }
+
+        .status.rejected {
+            color: var(--red);
+            background: rgba(255,135,153,.09);
+            border-color: rgba(255,135,153,.17);
+        }
+
+        /* ITEM INFORMATION */
+
+        .item-name {
+            margin-bottom: 10px;
+            color: #fbf9ff;
+            font-size: 23px;
+            letter-spacing: -.4px;
+            text-shadow: 0 0 22px rgba(177,139,255,.13);
+        }
+
+        .item-meta {
+            color: #aaa5bf;
+            font-size: 13px;
+            line-height: 1.9;
+        }
+
+        .item-meta strong {
+            color: #e5ddf6;
+            font-weight: 600;
+        }
+
+        /* DIVIDERS */
+
+        .divider {
+            position: relative;
+            height: 1px;
+            margin: 22px 0;
+            background: linear-gradient(
+                90deg,
+                rgba(181,138,255,.20),
+                rgba(255,255,255,.07),
+                transparent
+            );
+        }
+
+        /* SECTION LABELS */
+
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 12px;
+            color: #bd9aff;
+            font-size: 11px;
+            font-weight: 750;
+            letter-spacing: 1.3px;
+            text-transform: uppercase;
+            text-shadow: 0 0 16px rgba(181,138,255,.18);
+        }
+
+        .section-label::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 2px;
+            background: #a78bfa;
+            box-shadow: 0 0 10px #a78bfa;
+        }
+
+        /* STUDENT DETAILS */
+
+        .student-info {
+            display: grid;
+            gap: 7px;
+            color: #e4ddf7;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        /* OWNERSHIP EXPLANATION */
+
+        .message {
+            padding: 15px 17px;
+            border: 1px solid rgba(160,130,230,.20);
+            border-radius: 11px;
+            color: #d4cee4;
+            background:
+                linear-gradient(135deg,rgba(119,82,190,.09),rgba(55,92,170,.06)),
+                rgba(10,12,29,.42);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+            font-size: 13px;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+        }
+
+        /* SUPPORTING IMAGES */
+
+        .images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 13px;
+            margin-top: 14px;
+        }
+
+        .image-link {
+            position: relative;
+            display: block;
+            overflow: hidden;
+            width: 170px;
+            height: 140px;
+            border: 1px solid rgba(164,132,255,.34);
+            border-radius: 13px;
+            background: rgba(255,255,255,.04);
+            box-shadow:
+                0 10px 28px rgba(0,0,0,.25),
+                0 0 18px rgba(139,92,246,.07);
+            transition: .3s ease;
+        }
+
+        .images img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .4s ease;
+        }
+
+        .image-link:hover {
+            border-color: #b58aff;
+            box-shadow:
+                0 0 23px rgba(181,138,255,.22),
+                0 10px 25px rgba(0,0,0,.25);
+            transform: translateY(-3px);
+        }
+
+        .image-link:hover img {
+            transform: scale(1.08);
+        }
+
+        .no-image {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 12px 14px;
+            border: 1px dashed rgba(181,138,255,.22);
+            border-radius: 10px;
+            color: #aaa5bf;
+            background: rgba(255,255,255,.025);
+            font-size: 12px;
+        }
+
+        /* CLAIM ACTIONS */
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .actions form {
+            margin: 0;
+        }
+
+        .action-btn {
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            min-width: 150px;
+            min-height: 46px;
+            padding: 12px 20px;
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 12px;
+            color: white;
+            font-size: 12px;
+            font-weight: 750;
+            letter-spacing: .1px;
+            cursor: pointer;
+            transition: .25s ease;
+        }
+
+        .approve-btn {
+            background: linear-gradient(110deg,#087f68,#16b981);
+            box-shadow:
+                0 6px 18px rgba(16,185,129,.18),
+                inset 0 1px rgba(255,255,255,.2);
+        }
+
+        .reject-btn {
+            background: linear-gradient(110deg,#a91e55,#e04470);
+            box-shadow:
+                0 6px 18px rgba(225,29,72,.18),
+                inset 0 1px rgba(255,255,255,.2);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.15);
+        }
+
+        .approve-btn:hover {
+            box-shadow:
+                0 9px 25px rgba(16,185,129,.32),
+                0 0 17px rgba(16,185,129,.17);
+        }
+
+        .reject-btn:hover {
+            box-shadow:
+                0 9px 25px rgba(225,29,72,.30),
+                0 0 17px rgba(225,29,72,.16);
+        }
+
+        .action-btn:active {
+            transform: translateY(1px);
+        }
+
+        .action-btn:focus-visible,
+        .back-btn:focus-visible,
+        .image-link:focus-visible {
+            outline: 2px solid #c4a7ff;
+            outline-offset: 3px;
+        }
+
+        /* REVIEWED NOTE */
+
+        .reviewed-note {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 11px 14px;
+            margin-top: 22px;
+            border: 1px solid rgba(181,138,255,.14);
+            border-radius: 10px;
+            color: #aaa5bf;
+            background: rgba(255,255,255,.025);
+            font-size: 12px;
+        }
+
+        .reviewed-note::before {
+            content: "✓";
+            color: var(--green);
+            font-weight: 800;
+        }
+
+        /* EMPTY STATE */
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 310px;
+            padding: 45px 20px;
+            border: 1px solid rgba(166,120,255,.30);
+            border-radius: 20px;
+            background:
+                radial-gradient(circle at 50% 0%,rgba(139,92,246,.17),transparent 55%),
+                linear-gradient(145deg,rgba(37,31,61,.82),rgba(17,19,39,.92));
+            box-shadow:
+                0 22px 55px rgba(0,0,0,.22),
+                inset 0 1px rgba(255,255,255,.07);
+            backdrop-filter: blur(20px);
+            text-align: center;
+        }
+
+        .empty-icon {
+            display: grid;
+            place-items: center;
+            width: 65px;
+            height: 65px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(181,138,255,.30);
+            border-radius: 20px;
+            color: #c4a7ff;
+            background: rgba(139,92,246,.14);
+            box-shadow: 0 0 30px rgba(139,92,246,.16);
+            font-size: 29px;
+        }
+
+        .empty-state h2 {
+            margin-bottom: 12px;
+            font-size: 20px;
+        }
+
+        .empty-state p {
+            max-width: 400px;
+            color: #aaa5bf;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        /* FOOTER */
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 35px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            color: #77718e;
+            font-size: 10px;
+        }
+
+        .footer span {
+            color: #bd9aff;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 700px) {
+            .container {
+                width: 92%;
+                padding-top: 22px;
+            }
+
+            .topbar {
+                margin-bottom: 35px;
+            }
+
+            .claim-card {
+                padding: 20px;
+            }
+
+            .claim-top {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .claim-number {
+                white-space: normal;
+                line-height: 1.6;
+            }
+
+            .images img {
+                width: 100%;
+                height: 190px;
+            }
+
+            .image-link {
+                width: 100%;
+                height: 190px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .actions form {
+                width: 100%;
+            }
+
+            .action-btn {
+                width: 100%;
+            }
+
+            .footer {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .brand {
+                font-size: 16px;
+            }
+
+            .back-btn {
+                padding: 9px 11px;
+                font-size: 11px;
+            }
+
+            .claim-number {
+                font-size: 10px;
+            }
+
+            .item-name {
+                font-size: 20px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation: none !important;
+                transition: none !important;
+                scroll-behavior: auto !important;
+            }
+
+            #neural-network {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- AMBIENT BACKGROUND -->
+
+    <div class="background-glow">
+        <div class="ambient-orb orb-one"></div>
+        <div class="ambient-orb orb-two"></div>
+    </div>
+
+    <!-- NEURAL NETWORK CANVAS -->
+
+    <canvas id="neural-network" aria-hidden="true"></canvas>
+
+    <main class="container">
+
+        <!-- TOP NAVIGATION -->
+
+        <header class="topbar">
+
+            <a href="{{ url_for('admin_dashboard') }}" class="brand">
+                <div class="brand-icon">C</div>
+
+                <div>
+                    CEC <span>Lost &amp; Found</span>
+                </div>
+            </a>
+
+            <a href="{{ url_for('admin_dashboard') }}" class="back-btn">
+                <span>←</span>
+                Dashboard
+            </a>
+
+        </header>
+
+        <!-- PAGE HEADING -->
+
+        <section class="heading">
+
+            <small>Administration / Verification</small>
+
+            <h1>
+                Student <span>Claims</span>
+            </h1>
+
+            <p>
+                Review ownership explanations and supporting evidence
+                before making a verification decision.
+            </p>
+
+        </section>
+
+        <!-- FLASH MESSAGES -->
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% for category, message in messages %}
+
+                <div class="flash {{ category }}" role="alert">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endwith %}
+
+        <!-- CLAIMS LIST -->
+
+        <section class="claims-list">
+
+            {% for claim in claims %}
+
+                <article class="claim-card">
+
+                    <!-- CLAIM HEADER -->
+
+                    <div class="claim-top">
+
+                        <span class="claim-number">
+                            CLAIM #{{ claim.id }}
+                            · Submitted {{ claim.created_at.strftime('%d %b %Y, %I:%M %p') }}
+                        </span>
+
+                        <span class="status {{ claim.status|lower }}">
+                            {{ claim.status }}
+                        </span>
+
+                    </div>
+
+                    <!-- ITEM DETAILS -->
+
+                    <h2 class="item-name">
+                        {{ claim.item.item_name }}
+                    </h2>
+
+                    <div class="item-meta">
+                        Category: <strong>{{ claim.item.category }}</strong><br>
+                        Found at: <strong>{{ claim.item.location }}</strong><br>
+                        Item status: <strong>{{ claim.item.status }}</strong>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- STUDENT DETAILS -->
+
+                    <div class="section-label">
+                        Student Details
+                    </div>
+
+                    <div class="student-info">
+
+                        <div>
+                            Name: {{ claim.user.full_name }}
+                        </div>
+
+                        <div>
+                            USN: {{ claim.user.usn }}
+                        </div>
+
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- OWNERSHIP EXPLANATION -->
+
+                    <div class="section-label">
+                        Ownership Explanation
+                    </div>
+
+                    <p class="message">{{ claim.message }}</p>
+
+                    <div class="divider"></div>
+
+                    <!-- SUPPORTING IMAGES -->
+
+                    <div class="section-label">
+                        Supporting Images
+                    </div>
+
+                    {% if claim.images %}
+
+                        <div class="images">
+
+                            {% for image in claim.images %}
+
+                                <a
+                                    class="image-link"
+                                    href="{{ url_for('uploaded_file', filename=image.filename) }}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+
+                                    <img
+                                        src="{{ url_for('uploaded_file', filename=image.filename) }}"
+                                        alt="Claim supporting evidence"
+                                        loading="lazy"
+                                    >
+
+                                </a>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% else %}
+
+                        <p class="no-image">
+                            <span>▧</span>
+                            No supporting image was uploaded.
+                        </p>
+
+                    {% endif %}
+
+                    <!-- APPROVE / REJECT -->
+
+                    {% if claim.status == "Pending" %}
+
+                        <div class="actions">
+
+                            <!-- APPROVE CLAIM -->
+
+                            <form
+                                method="POST"
+                                action="{{ url_for('approve_claim', claim_id=claim.id) }}"
+                                onsubmit="return confirm('Are you sure you want to approve this claim?');"
+                            >
+
+                                <input
+                                    type="hidden"
+                                    name="csrf_token"
+                                    value="{{ csrf_token() }}"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="action-btn approve-btn"
+                                >
+                                    <span>✓</span>
+                                    Approve Claim
+                                </button>
+
+                            </form>
+
+                            <!-- REJECT CLAIM -->
+
+                            <form
+                                method="POST"
+                                action="{{ url_for('reject_claim', claim_id=claim.id) }}"
+                                onsubmit="return confirm('Are you sure you want to reject this claim?');"
+                            >
+
+                                <input
+                                    type="hidden"
+                                    name="csrf_token"
+                                    value="{{ csrf_token() }}"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="action-btn reject-btn"
+                                >
+                                    <span>✕</span>
+                                    Reject Claim
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    {% else %}
+
+                        <p class="reviewed-note">
+                            This claim has already been reviewed.
+                        </p>
+
+                    {% endif %}
+
+                </article>
+
+            {% else %}
+
+                <!-- EMPTY STATE -->
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">▤</div>
+
+                    <h2>No Claims Yet</h2>
+
+                    <p>
+                        Student claims will appear here when they submit
+                        ownership verification requests.
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </section>
+
+        <!-- FOOTER -->
+
+        <footer class="footer">
+
+            <p>
+                CEC Lost &amp; Found · Administration
+            </p>
+
+            <p>
+                Secure <span>Verification Workspace</span>
+            </p>
+
+        </footer>
+
+    </main>
+
+    <!-- CUSTOM CURSOR -->
+
+    <div class="cursor-glow"></div>
+    <div class="custom-cursor"></div>
+
+    <!-- NEURAL NETWORK ANIMATION -->
+
+    <script>
+    (() => {
+
+        const canvas = document.getElementById("neural-network");
+
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d");
+
+        if (!ctx) return;
+
+        const reduceMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        );
+
+        if (reduceMotion.matches) return;
+
+        let width = 0;
+        let height = 0;
+        let particles = [];
+        let animationFrame = null;
+
+        const mouse = {
+            x: 0,
+            y: 0,
+            active: false,
+            radius: 165
+        };
+
+        const settings = {
+            maxParticles: 145,
+            density: 9000,
+            linkDistance: 150,
+            speed: 0.35
+        };
+
+        function random(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        function createParticle() {
+
+            const angle = random(0, Math.PI * 2);
+            const speed = random(0.08, settings.speed);
+
+            return {
+                x: random(0, width),
+                y: random(0, height),
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                radius: random(1, 2.2),
+                phase: random(0, Math.PI * 2),
+                pulseSpeed: random(0.008, 0.023),
+                color: Math.random() > 0.5
+                    ? "190, 105, 255"
+                    : "75, 135, 255"
+            };
+        }
+
+        function resizeCanvas() {
+
+            const oldWidth = width || window.innerWidth;
+            const oldHeight = height || window.innerHeight;
+
+            width = window.innerWidth;
+            height = window.innerHeight;
+
+            const dpr = Math.min(
+                window.devicePixelRatio || 1,
+                2
+            );
+
+            canvas.width = Math.round(width * dpr);
+            canvas.height = Math.round(height * dpr);
+
+            canvas.style.width = width + "px";
+            canvas.style.height = height + "px";
+
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            particles.forEach(p => {
+                p.x *= width / oldWidth;
+                p.y *= height / oldHeight;
+            });
+
+            const count = Math.min(
+                settings.maxParticles,
+                Math.max(
+                    40,
+                    Math.floor(width * height / settings.density)
+                )
+            );
+
+            while (particles.length < count) {
+                particles.push(createParticle());
+            }
+
+            particles.length = Math.min(particles.length, count);
+        }
+
+        function updateParticles() {
+
+            particles.forEach(p => {
+
+                p.phase += p.pulseSpeed;
+
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (mouse.active) {
+
+                    const dx = p.x - mouse.x;
+                    const dy = p.y - mouse.y;
+
+                    const distance = Math.hypot(dx, dy);
+
+                    if (distance > 0 && distance < mouse.radius) {
+
+                        const force =
+                            (mouse.radius - distance) / mouse.radius;
+
+                        p.x += (dx / distance) * force * 1.4;
+                        p.y += (dy / distance) * force * 1.4;
+                    }
+                }
+
+                if (p.x < 0 || p.x > width) p.vx *= -1;
+                if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                p.x = Math.max(0, Math.min(width, p.x));
+                p.y = Math.max(0, Math.min(height, p.y));
+
+            });
+        }
+
+        function drawConnections() {
+
+            const maxDistance =
+                settings.linkDistance * settings.linkDistance;
+
+            for (let i = 0; i < particles.length; i++) {
+
+                for (let j = i + 1; j < particles.length; j++) {
+
+                    const a = particles[i];
+                    const b = particles[j];
+
+                    const dx = a.x - b.x;
+                    const dy = a.y - b.y;
+
+                    const distanceSquared =
+                        dx * dx + dy * dy;
+
+                    if (distanceSquared >= maxDistance) continue;
+
+                    const distance = Math.sqrt(distanceSquared);
+
+                    const opacity =
+                        (1 - distance / settings.linkDistance) * 0.30;
+
+                    const gradient = ctx.createLinearGradient(
+                        a.x, a.y, b.x, b.y
+                    );
+
+                    gradient.addColorStop(
+                        0,
+                        `rgba(190, 105, 255, ${opacity})`
+                    );
+
+                    gradient.addColorStop(
+                        1,
+                        `rgba(75, 135, 255, ${opacity})`
+                    );
+
+                    ctx.beginPath();
+                    ctx.strokeStyle = gradient;
+                    ctx.lineWidth = 0.7;
+                    ctx.moveTo(a.x, a.y);
+                    ctx.lineTo(b.x, b.y);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function drawParticles() {
+
+            particles.forEach(p => {
+
+                const pulse =
+                    0.65 + Math.sin(p.phase) * 0.35;
+
+                const glowRadius = p.radius * 5;
+
+                const glow = ctx.createRadialGradient(
+                    p.x, p.y, 0,
+                    p.x, p.y, glowRadius
+                );
+
+                glow.addColorStop(
+                    0,
+                    `rgba(${p.color}, ${0.85 * pulse})`
+                );
+
+                glow.addColorStop(
+                    1,
+                    `rgba(${p.color}, 0)`
+                );
+
+                ctx.beginPath();
+                ctx.fillStyle = glow;
+
+                ctx.arc(
+                    p.x,
+                    p.y,
+                    glowRadius,
+                    0,
+                    Math.PI * 2
+                );
+
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.fillStyle =
+                    `rgba(235, 220, 255, ${0.85 * pulse})`;
+
+                ctx.arc(
+                    p.x,
+                    p.y,
+                    p.radius,
+                    0,
+                    Math.PI * 2
+                );
+
+                ctx.fill();
+
+            });
+        }
+
+        function drawMouseGlow() {
+
+            if (!mouse.active) return;
+
+            const glow = ctx.createRadialGradient(
+                mouse.x,
+                mouse.y,
+                0,
+                mouse.x,
+                mouse.y,
+                mouse.radius
+            );
+
+            glow.addColorStop(
+                0,
+                "rgba(160, 80, 255, .08)"
+            );
+
+            glow.addColorStop(
+                1,
+                "rgba(160, 80, 255, 0)"
+            );
+
+            ctx.beginPath();
+            ctx.fillStyle = glow;
+
+            ctx.arc(
+                mouse.x,
+                mouse.y,
+                mouse.radius,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fill();
+        }
+
+        function animate() {
+
+            ctx.clearRect(0, 0, width, height);
+
+            updateParticles();
+            drawConnections();
+            drawParticles();
+            drawMouseGlow();
+
+            animationFrame = requestAnimationFrame(animate);
+        }
+
+        window.addEventListener("pointermove", event => {
+
+            if (event.pointerType === "touch") return;
+
+            mouse.x = event.clientX;
+            mouse.y = event.clientY;
+            mouse.active = true;
+
+        }, { passive: true });
+
+        window.addEventListener("pointerout", event => {
+
+            if (!event.relatedTarget) {
+                mouse.active = false;
+            }
+
+        }, { passive: true });
+
+        window.addEventListener("resize", resizeCanvas, {
+            passive: true
+        });
+
+        document.addEventListener("visibilitychange", () => {
+
+            if (document.hidden && animationFrame !== null) {
+
+                cancelAnimationFrame(animationFrame);
+                animationFrame = null;
+
+            } else if (!document.hidden && animationFrame === null) {
+
+                animate();
+            }
+
+        });
+
+        resizeCanvas();
+        animate();
+
+    })();
+    </script>
+
+    <!-- FLASH MESSAGE AUTO DISMISS -->
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const messages = document.querySelectorAll(".flash");
+
+        messages.forEach(function (message) {
+
+            setTimeout(function () {
+
+                message.classList.add("fade-out");
+
+                setTimeout(function () {
+                    message.remove();
+                }, 500);
+
+            }, 4000);
+
+        });
+
+    });
+    </script>
+
+    <!-- CUSTOM CURSOR -->
+
+    <script src="{{ url_for('static', filename='js/cursor.js') }}?v=4"></script>
+
+</body>
+</html>

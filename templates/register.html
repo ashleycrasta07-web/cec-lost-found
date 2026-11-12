@@ -1,0 +1,1232 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEC | Student Registration</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --pink: #ff4db8;
+            --magenta: #d946ef;
+            --purple: #923cff;
+            --blue: #398bff;
+            --text: #f8f2ff;
+            --muted: #aaa1c2;
+        }
+
+        html {
+            min-height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 35px 16px;
+            color: var(--text);
+            background:
+                radial-gradient(
+                    ellipse at 12% 12%,
+                    rgba(220, 45, 160, .27),
+                    transparent 42%
+                ),
+                radial-gradient(
+                    ellipse at 88% 85%,
+                    rgba(142, 48, 205, .25),
+                    transparent 42%
+                ),
+                radial-gradient(
+                    ellipse at 50% 50%,
+                    rgba(92, 25, 115, .14),
+                    transparent 65%
+                ),
+                #100b20;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* NEURAL NETWORK CANVAS */
+
+        #networkCanvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 1;
+        }
+
+        .ambient-orb {
+            position: fixed;
+            z-index: 0;
+            width: 380px;
+            height: 380px;
+            border-radius: 50%;
+            filter: blur(115px);
+            opacity: .28;
+            pointer-events: none;
+            animation: orbFloat 12s ease-in-out infinite alternate;
+        }
+
+        .orb-one {
+            top: -130px;
+            left: -100px;
+            background: #ff24b8;
+        }
+
+        .orb-two {
+            right: -130px;
+            bottom: -100px;
+            background: #923cff;
+            animation-delay: -5s;
+        }
+
+        .orb-three {
+            top: 42%;
+            right: 15%;
+            width: 200px;
+            height: 200px;
+            background: #ed3a9d;
+            opacity: .17;
+            animation-delay: -8s;
+        }
+
+        @keyframes orbFloat {
+            from {
+                transform: translate(0, 0);
+            }
+            to {
+                transform: translate(45px, 35px);
+            }
+        }
+
+        /* REGISTRATION WRAPPER */
+
+        .page-wrapper {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .register-card {
+            position: relative;
+            width: min(465px, 100%);
+            padding: 35px 37px 27px;
+            overflow: hidden;
+            border: 1px solid rgba(210, 104, 255, .27);
+            border-radius: 23px;
+            background: linear-gradient(
+                145deg,
+                rgba(36, 29, 61, .94),
+                rgba(20, 17, 42, .96)
+            );
+            backdrop-filter: blur(22px);
+            box-shadow:
+                0 25px 75px rgba(0, 0, 0, .38),
+                0 0 45px rgba(225, 55, 170, .08);
+            animation: cardEnter .65s ease both;
+        }
+
+        .register-card::before {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                #ff36b5,
+                #a855f7,
+                #398bff,
+                transparent
+            );
+            content: "";
+        }
+
+        @keyframes cardEnter {
+            from {
+                opacity: 0;
+                transform: translateY(22px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* BRAND */
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .brand-icon {
+            display: grid;
+            place-items: center;
+            width: 57px;
+            height: 57px;
+            margin-bottom: 13px;
+            border-radius: 17px;
+            background: linear-gradient(135deg, #ec36b4, #6545ff);
+            color: white;
+            font-size: 27px;
+            font-weight: 850;
+            box-shadow: 0 0 30px rgba(236, 54, 180, .4);
+            animation: iconGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes iconGlow {
+            from {
+                box-shadow: 0 0 17px rgba(236, 54, 180, .25);
+            }
+            to {
+                box-shadow:
+                    0 0 30px rgba(236, 54, 180, .45),
+                    0 0 40px rgba(101, 69, 255, .2);
+            }
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 21px;
+            letter-spacing: -.3px;
+        }
+
+        .brand h1 span {
+            background: linear-gradient(90deg, #ff80d1, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand p {
+            margin: 7px 0 0;
+            color: var(--muted);
+            font-size: 10px;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+
+        /* FORM HEADING */
+
+        .form-heading {
+            margin: 29px 0 23px;
+            text-align: center;
+        }
+
+        .form-heading h2 {
+            margin: 0 0 8px;
+            font-size: 25px;
+            font-weight: 800;
+            letter-spacing: -.5px;
+        }
+
+        .form-heading h2 span {
+            color: #f08aff;
+        }
+
+        .form-heading p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        /* FLASH MESSAGES */
+
+        .flash-messages {
+            margin-bottom: 17px;
+        }
+
+        .flash-message {
+            padding: 12px 13px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(226, 112, 255, .3);
+            border-radius: 9px;
+            color: #f4d8ff;
+            background: rgba(135, 48, 125, .2);
+            font-size: 11px;
+            line-height: 1.6;
+            transition: opacity .5s ease, transform .5s ease;
+        }
+
+        .flash-message.error,
+        .flash-message.danger {
+            border-color: rgba(255, 113, 143, .4);
+            color: #ffc1d0;
+            background: rgba(128, 39, 69, .25);
+        }
+
+        .flash-message.success {
+            border-color: rgba(57, 214, 163, .4);
+            color: #a9f4cb;
+            background: rgba(24, 111, 82, .22);
+        }
+
+        .flash-message.fade-out {
+            opacity: 0;
+            transform: translateY(-8px);
+            pointer-events: none;
+        }
+
+        /* INPUTS */
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 9px;
+            color: #f0e8fa;
+            font-size: 11px;
+            font-weight: 750;
+            letter-spacing: .2px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            top: 50%;
+            left: 14px;
+            transform: translateY(-50%);
+            color: #d08acb;
+            font-size: 15px;
+            pointer-events: none;
+        }
+
+        .input-group input {
+            width: 100%;
+            height: 47px;
+            padding: 0 43px;
+            border: 1px solid rgba(211, 125, 255, .25);
+            border-radius: 10px;
+            outline: none;
+            color: var(--text);
+            background: rgba(15, 12, 33, .76);
+            font-family: inherit;
+            font-size: 11px;
+            transition: .25s ease;
+        }
+
+        .input-group input:focus {
+            border-color: #f071c9;
+            background: rgba(35, 20, 52, .92);
+            box-shadow:
+                0 0 0 3px rgba(255, 54, 181, .10),
+                0 0 20px rgba(255, 54, 181, .10);
+        }
+
+        .input-group input::placeholder {
+            color: #827991;
+        }
+
+        .input-group input.invalid {
+            border-color: #ff718f;
+            box-shadow: 0 0 0 3px rgba(255, 113, 143, .08);
+        }
+
+        /* PASSWORD VISIBILITY */
+
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 13px;
+            display: grid;
+            place-items: center;
+            width: 26px;
+            height: 26px;
+            padding: 0;
+            transform: translateY(-50%);
+            border: none;
+            border-radius: 6px;
+            color: #c4a4d7;
+            background: transparent;
+            font-size: 15px;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .password-toggle:hover {
+            color: #ff9bd9;
+            background: rgba(255, 54, 181, .12);
+        }
+
+        .password-hint {
+            margin-top: 7px;
+            color: #958aa9;
+            font-size: 9px;
+            line-height: 1.5;
+        }
+
+        .validation-message {
+            display: none;
+            margin-top: 7px;
+            color: #ff9bb6;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        .validation-message.show {
+            display: block;
+        }
+
+        /* PASSWORD STRENGTH */
+
+        .strength-container {
+            display: none;
+            margin-top: 9px;
+        }
+
+        .strength-bars {
+            display: flex;
+            gap: 5px;
+        }
+
+        .strength-bar {
+            height: 4px;
+            flex: 1;
+            border-radius: 5px;
+            background: rgba(180, 130, 180, .18);
+            transition: background .2s ease;
+        }
+
+        .strength-label {
+            display: block;
+            margin-top: 6px;
+            color: #aa9bb7;
+            font-size: 9px;
+        }
+
+        /* REGISTER BUTTON */
+
+        .register-button {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            min-height: 49px;
+            padding: 0 17px;
+            margin-top: 25px;
+            border: 1px solid rgba(255, 145, 220, .35);
+            border-radius: 11px;
+            color: white;
+            background: linear-gradient(105deg, #db36b4, #7545f5);
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 8px 22px rgba(211, 54, 180, .18);
+            transition: .25s ease;
+        }
+
+        .register-button:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+            box-shadow:
+                0 10px 27px rgba(211, 54, 180, .32),
+                0 0 20px rgba(211, 54, 180, .12);
+        }
+
+        .register-button:active {
+            transform: translateY(0);
+        }
+
+        .button-arrow {
+            display: grid;
+            place-items: center;
+            width: 27px;
+            height: 27px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, .16);
+            font-size: 16px;
+            transition: transform .2s ease;
+        }
+
+        .register-button:hover .button-arrow {
+            transform: translateX(3px);
+        }
+
+        .register-button:focus-visible,
+        .password-toggle:focus-visible {
+            outline: 2px solid #ff80d1;
+            outline-offset: 4px;
+        }
+
+        /* LOGIN LINK AND FOOTER */
+
+        .login-link {
+            margin: 22px 0 0;
+            color: var(--muted);
+            text-align: center;
+            font-size: 11px;
+        }
+
+        .login-link a {
+            color: #ff80d1;
+            font-weight: 800;
+            text-decoration: none;
+            transition: color .2s ease;
+        }
+
+        .login-link a:hover {
+            color: #c4a5ff;
+            text-decoration: underline;
+        }
+
+        .footer-text {
+            padding-top: 19px;
+            margin: 22px 0 0;
+            border-top: 1px solid rgba(200, 120, 200, .14);
+            color: #887a9b;
+            text-align: center;
+            font-size: 9px;
+            letter-spacing: .4px;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 480px) {
+            body {
+                padding: 20px 12px;
+            }
+
+            .register-card {
+                padding: 28px 21px 23px;
+                border-radius: 19px;
+            }
+
+            .brand-icon {
+                width: 51px;
+                height: 51px;
+            }
+
+            .brand h1 {
+                font-size: 19px;
+            }
+
+            .form-heading {
+                margin-top: 25px;
+            }
+
+            .form-heading h2 {
+                font-size: 23px;
+            }
+
+            .input-group input {
+                height: 46px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NEURAL NETWORK BACKGROUND -->
+    <canvas id="networkCanvas" aria-hidden="true"></canvas>
+
+    <div class="ambient-orb orb-one"></div>
+    <div class="ambient-orb orb-two"></div>
+    <div class="ambient-orb orb-three"></div>
+
+    <!-- REGISTRATION PAGE -->
+    <main class="page-wrapper">
+        <section class="register-card">
+
+            <div class="brand">
+                <div class="brand-icon">C</div>
+                <h1>CEC <span>Lost &amp; Found</span></h1>
+                <p>Campus Lost &amp; Found Portal</p>
+            </div>
+
+            <div class="form-heading">
+                <h2>Create <span>Account</span></h2>
+                <p>Join the CEC Lost &amp; Found community</p>
+            </div>
+
+            <!-- FLASH MESSAGES -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- REGISTRATION FORM -->
+            <form
+                id="registerForm"
+                method="POST"
+                action="{{ url_for('register') }}"
+            >
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
+                <!-- FULL NAME -->
+                <div class="input-group">
+                    <label for="full_name">Full Name</label>
+
+                    <div class="input-wrapper">
+                        <span class="input-icon" aria-hidden="true">♙</span>
+
+                        <input
+                            type="text"
+                            id="full_name"
+                            name="full_name"
+                            placeholder="Enter your full name"
+                            maxlength="100"
+                            autocomplete="name"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- USN -->
+                <div class="input-group">
+                    <label for="usn">University Seat Number (USN)</label>
+
+                    <div class="input-wrapper">
+                        <span class="input-icon" aria-hidden="true">▤</span>
+
+                        <input
+                            type="text"
+                            id="usn"
+                            name="usn"
+                            placeholder="Enter your USN"
+                            maxlength="20"
+                            autocomplete="username"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- PASSWORD -->
+                <div class="input-group">
+                    <label for="password">Password</label>
+
+                    <div class="input-wrapper">
+                        <span class="input-icon" aria-hidden="true">◆</span>
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Create a password"
+                            minlength="8"
+                            autocomplete="new-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            data-target="password"
+                            aria-label="Show password"
+                            aria-pressed="false"
+                        >◉</button>
+                    </div>
+
+                    <div class="password-hint">
+                        Use at least 8 characters for your password.
+                    </div>
+
+                    <div class="strength-container" id="strengthContainer">
+                        <div class="strength-bars">
+                            <span class="strength-bar"></span>
+                            <span class="strength-bar"></span>
+                            <span class="strength-bar"></span>
+                            <span class="strength-bar"></span>
+                        </div>
+
+                        <span class="strength-label" id="strengthLabel">
+                            Password strength
+                        </span>
+                    </div>
+                </div>
+
+                <!-- CONFIRM PASSWORD -->
+                <div class="input-group">
+                    <label for="confirm_password">Confirm Password</label>
+
+                    <div class="input-wrapper">
+                        <span class="input-icon" aria-hidden="true">◆</span>
+
+                        <input
+                            type="password"
+                            id="confirm_password"
+                            name="confirm_password"
+                            placeholder="Confirm your password"
+                            minlength="8"
+                            autocomplete="new-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            data-target="confirm_password"
+                            aria-label="Show confirm password"
+                            aria-pressed="false"
+                        >◉</button>
+                    </div>
+
+                    <div
+                        class="validation-message"
+                        id="passwordError"
+                        role="alert"
+                    >
+                        Passwords do not match.
+                    </div>
+                </div>
+
+                <!-- SUBMIT -->
+                <button type="submit" class="register-button">
+                    <span>Create Account</span>
+                    <span class="button-arrow">→</span>
+                </button>
+            </form>
+
+            <p class="login-link">
+                Already have an account?
+                <a href="{{ url_for('login') }}">Sign In</a>
+            </p>
+
+            <p class="footer-text">
+                CEC Lost &amp; Found · Secure Student Access
+            </p>
+
+        </section>
+    </main>
+
+    <!-- CUSTOM CURSOR -->
+    <div class="cursor-glow"></div>
+    <div class="custom-cursor"></div>
+    <div class="cursor-trail"></div>
+
+    <script src="{{ url_for('static', filename='js/cursor.js') }}?v=3"></script>
+
+    <!-- DENSE NEURAL NETWORK ANIMATION -->
+    <script>
+    (function () {
+        "use strict";
+
+        const canvas = document.getElementById("networkCanvas");
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d", { alpha: true });
+        if (!ctx) return;
+
+        const reducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        ).matches;
+
+        let width = 0;
+        let height = 0;
+        let nodes = [];
+        let animationFrame = null;
+        let pageVisible = !document.hidden;
+        let lastFrameTime = 0;
+
+        // Animation performance settings.
+        const FRAME_INTERVAL = 1000 / 30;
+        const MAX_DPR = 1.5;
+
+        // Dense neural network settings.
+        const MAX_NODES = 160;
+        const CONNECTION_DISTANCE = 190;
+        const CONNECTION_DISTANCE_SQUARED =
+            CONNECTION_DISTANCE * CONNECTION_DISTANCE;
+
+        const pointer = {
+            x: -1000,
+            y: -1000
+        };
+
+        // Create network nodes.
+        function createNodes() {
+            const count = Math.min(
+                MAX_NODES,
+                Math.max(
+                    75,
+                    Math.floor((width * height) / 9000)
+                )
+            );
+
+            nodes = Array.from({ length: count }, () => ({
+                x: Math.random() * width,
+                y: Math.random() * height,
+
+                vx: reducedMotion
+                    ? 0
+                    : (Math.random() - 0.5) * 0.30,
+
+                vy: reducedMotion
+                    ? 0
+                    : (Math.random() - 0.5) * 0.30,
+
+                radius: Math.random() * 1.6 + 1.3,
+                phase: Math.random() * Math.PI * 2
+            }));
+        }
+
+        // Resize canvas.
+        function resizeCanvas() {
+            const dpr = Math.min(
+                window.devicePixelRatio || 1,
+                MAX_DPR
+            );
+
+            width = window.innerWidth;
+            height = window.innerHeight;
+
+            canvas.width = Math.round(width * dpr);
+            canvas.height = Math.round(height * dpr);
+
+            canvas.style.width = width + "px";
+            canvas.style.height = height + "px";
+
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            createNodes();
+            drawStaticFrame();
+
+            lastFrameTime = 0;
+            scheduleFrame();
+        }
+
+        // Move nodes.
+        function updateNodes() {
+            if (reducedMotion) return;
+
+            for (const node of nodes) {
+                node.x += node.vx;
+                node.y += node.vy;
+
+                node.phase += 0.018;
+
+                if (node.x < 0 || node.x > width) {
+                    node.vx *= -1;
+                }
+
+                if (node.y < 0 || node.y > height) {
+                    node.vy *= -1;
+                }
+
+                // Subtle pointer interaction.
+                const dx = pointer.x - node.x;
+                const dy = pointer.y - node.y;
+
+                const distanceSquared = dx * dx + dy * dy;
+
+                if (
+                    distanceSquared < 150 * 150 &&
+                    distanceSquared > 0
+                ) {
+                    node.x -= dx * 0.0008;
+                    node.y -= dy * 0.0008;
+                }
+            }
+        }
+
+        // Draw network connections.
+        function drawConnections() {
+            ctx.lineWidth = 1.05;
+
+            for (let i = 0; i < nodes.length; i++) {
+                const node = nodes[i];
+
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const other = nodes[j];
+
+                    const dx = node.x - other.x;
+                    const dy = node.y - other.y;
+
+                    const distanceSquared = dx * dx + dy * dy;
+
+                    if (
+                        distanceSquared >=
+                        CONNECTION_DISTANCE_SQUARED
+                    ) {
+                        continue;
+                    }
+
+                    const distance = Math.sqrt(distanceSquared);
+
+                    const opacity =
+                        (1 - distance / CONNECTION_DISTANCE) * 0.82;
+
+                    ctx.beginPath();
+
+                    ctx.strokeStyle =
+                        `rgba(255, 75, 205, ${opacity})`;
+
+                    ctx.moveTo(node.x, node.y);
+                    ctx.lineTo(other.x, other.y);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // Draw glowing nodes.
+        function drawNodes() {
+            for (const node of nodes) {
+                const pulse = reducedMotion
+                    ? 1
+                    : 0.8 + Math.sin(node.phase) * 0.2;
+
+                ctx.beginPath();
+
+                ctx.arc(
+                    node.x,
+                    node.y,
+                    node.radius * pulse,
+                    0,
+                    Math.PI * 2
+                );
+
+                ctx.fillStyle = "#ff9be5";
+                ctx.shadowColor = "#ff25b8";
+                ctx.shadowBlur = 13;
+
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        // Cursor glow.
+        function drawPointerGlow() {
+            if (pointer.x < 0 || pointer.y < 0) return;
+
+            const radius = 165;
+
+            const gradient = ctx.createRadialGradient(
+                pointer.x,
+                pointer.y,
+                0,
+                pointer.x,
+                pointer.y,
+                radius
+            );
+
+            gradient.addColorStop(
+                0,
+                "rgba(255, 45, 190, 0.14)"
+            );
+
+            gradient.addColorStop(
+                0.5,
+                "rgba(190, 55, 210, 0.06)"
+            );
+
+            gradient.addColorStop(
+                1,
+                "rgba(255, 45, 190, 0)"
+            );
+
+            ctx.fillStyle = gradient;
+
+            ctx.fillRect(
+                pointer.x - radius,
+                pointer.y - radius,
+                radius * 2,
+                radius * 2
+            );
+        }
+
+        // Draw everything.
+        function drawStaticFrame() {
+            ctx.clearRect(0, 0, width, height);
+
+            drawConnections();
+            drawNodes();
+            drawPointerGlow();
+        }
+
+        // Animation loop.
+        function render(timestamp) {
+            animationFrame = null;
+
+            if (!pageVisible) return;
+
+            if (
+                lastFrameTime &&
+                timestamp - lastFrameTime < FRAME_INTERVAL
+            ) {
+                scheduleFrame();
+                return;
+            }
+
+            lastFrameTime = timestamp;
+
+            updateNodes();
+            drawStaticFrame();
+
+            if (!reducedMotion) {
+                scheduleFrame();
+            }
+        }
+
+        function scheduleFrame() {
+            if (
+                !reducedMotion &&
+                pageVisible &&
+                animationFrame === null
+            ) {
+                animationFrame = requestAnimationFrame(render);
+            }
+        }
+
+        // Track pointer position.
+        window.addEventListener(
+            "pointermove",
+            function (event) {
+                pointer.x = event.clientX;
+                pointer.y = event.clientY;
+
+                if (reducedMotion) {
+                    drawStaticFrame();
+                }
+            },
+            { passive: true }
+        );
+
+        window.addEventListener("pointerleave", function () {
+            pointer.x = -1000;
+            pointer.y = -1000;
+
+            if (reducedMotion) {
+                drawStaticFrame();
+            }
+        });
+
+        // Debounced resizing.
+        let resizeTimer = null;
+
+        window.addEventListener(
+            "resize",
+            function () {
+                clearTimeout(resizeTimer);
+
+                resizeTimer = setTimeout(
+                    resizeCanvas,
+                    120
+                );
+            },
+            { passive: true }
+        );
+
+        // Pause when browser tab is hidden.
+        document.addEventListener(
+            "visibilitychange",
+            function () {
+                pageVisible = !document.hidden;
+
+                if (!pageVisible) {
+                    if (animationFrame !== null) {
+                        cancelAnimationFrame(animationFrame);
+                        animationFrame = null;
+                    }
+
+                    return;
+                }
+
+                lastFrameTime = 0;
+                drawStaticFrame();
+                scheduleFrame();
+            }
+        );
+
+        resizeCanvas();
+
+    })();
+    </script>
+
+    <!-- PASSWORD VISIBILITY AND VALIDATION -->
+    <script>
+        const passwordInput =
+            document.getElementById("password");
+
+        const confirmInput =
+            document.getElementById("confirm_password");
+
+        const passwordError =
+            document.getElementById("passwordError");
+
+        const form =
+            document.getElementById("registerForm");
+
+        // Show and hide passwords.
+        document.querySelectorAll(".password-toggle").forEach(button => {
+            button.addEventListener("click", function () {
+                const input = document.getElementById(
+                    this.dataset.target
+                );
+
+                const visible = input.type === "password";
+
+                input.type = visible ? "text" : "password";
+                this.textContent = visible ? "◎" : "◉";
+
+                this.setAttribute(
+                    "aria-label",
+                    visible ? "Hide password" : "Show password"
+                );
+
+                this.setAttribute(
+                    "aria-pressed",
+                    String(visible)
+                );
+            });
+        });
+
+        // Password strength indicator.
+        const strengthContainer =
+            document.getElementById("strengthContainer");
+
+        const strengthBars =
+            document.querySelectorAll(".strength-bar");
+
+        const strengthLabel =
+            document.getElementById("strengthLabel");
+
+        function checkStrength(value) {
+            let score = 0;
+
+            if (value.length >= 8) score++;
+
+            if (
+                /[a-z]/.test(value) &&
+                /[A-Z]/.test(value)
+            ) {
+                score++;
+            }
+
+            if (/[0-9]/.test(value)) score++;
+
+            if (/[^A-Za-z0-9]/.test(value)) score++;
+
+            const labels = [
+                "",
+                "Weak password",
+                "Fair password",
+                "Good password",
+                "Strong password"
+            ];
+
+            const colors = [
+                "",
+                "#ff718f",
+                "#f6c76b",
+                "#e879c7",
+                "#39d6a3"
+            ];
+
+            strengthBars.forEach((bar, index) => {
+                bar.style.background =
+                    index < score
+                        ? colors[score]
+                        : "rgba(180, 130, 180, .18)";
+            });
+
+            strengthLabel.textContent =
+                labels[score] || "Password strength";
+        }
+
+        passwordInput.addEventListener("input", function () {
+            strengthContainer.style.display =
+                this.value ? "block" : "none";
+
+            checkStrength(this.value);
+            validatePasswords();
+        });
+
+        // Confirm password validation.
+        function validatePasswords() {
+            const hasConfirmation =
+                confirmInput.value.length > 0;
+
+            const matches =
+                passwordInput.value === confirmInput.value;
+
+            if (hasConfirmation && !matches) {
+                passwordError.classList.add("show");
+                confirmInput.classList.add("invalid");
+
+                return false;
+            }
+
+            passwordError.classList.remove("show");
+            confirmInput.classList.remove("invalid");
+
+            return true;
+        }
+
+        confirmInput.addEventListener(
+            "input",
+            validatePasswords
+        );
+
+        // Prevent submission when passwords do not match.
+        form.addEventListener("submit", function (event) {
+            if (!validatePasswords()) {
+                event.preventDefault();
+                confirmInput.focus();
+            }
+        });
+
+        // Automatically dismiss flash messages.
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".flash-message").forEach(message => {
+                setTimeout(() => {
+                    message.classList.add("fade-out");
+
+                    setTimeout(() => {
+                        message.remove();
+                    }, 500);
+                }, 4000);
+            });
+        });
+    </script>
+
+</body>
+</html>

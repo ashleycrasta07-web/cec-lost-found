@@ -1,0 +1,1516 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEC | Browse Items</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        /* =====================================
+           MAIN BACKGROUND
+        ===================================== */
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            color: #f7f5ff;
+            background: #100812;
+            font-family: Inter, Arial, sans-serif;
+        }
+
+        .background-effects {
+            position: fixed !important;
+            inset: 0;
+            z-index: 0 !important;
+            overflow: hidden;
+            pointer-events: none;
+
+            background:
+                radial-gradient(
+                    ellipse at 12% 20%,
+                    rgba(151, 39, 173, .20),
+                    transparent 45%
+                ),
+                radial-gradient(
+                    ellipse at 85% 75%,
+                    rgba(180, 40, 180, .13),
+                    transparent 45%
+                ),
+                #100812;
+        }
+
+        #particle-network {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .browse-page {
+            position: relative;
+            z-index: 2;
+            width: min(1180px, 92%);
+            margin: auto;
+            padding: 32px 0 55px;
+        }
+
+        /* =====================================
+           BACKGROUND BUBBLES
+        ===================================== */
+
+        .bubble {
+            position: absolute;
+            display: block;
+            border-radius: 50%;
+
+            background: radial-gradient(
+                circle,
+                rgba(224, 100, 255, .55),
+                rgba(190, 48, 218, .12) 55%,
+                transparent 75%
+            );
+
+            box-shadow: 0 0 25px rgba(220, 70, 255, .2);
+
+            animation: bubbleFloat 12s ease-in-out infinite alternate;
+        }
+
+        .bubble-one {
+            width: 110px;
+            height: 110px;
+            top: 12%;
+            left: 8%;
+        }
+
+        .bubble-two {
+            width: 75px;
+            height: 75px;
+            top: 65%;
+            left: 80%;
+            animation-delay: -3s;
+        }
+
+        .bubble-three {
+            width: 45px;
+            height: 45px;
+            top: 30%;
+            right: 10%;
+            animation-delay: -5s;
+        }
+
+        .bubble-four {
+            width: 90px;
+            height: 90px;
+            bottom: 5%;
+            left: 40%;
+            animation-delay: -7s;
+        }
+
+        .bubble-five {
+            width: 35px;
+            height: 35px;
+            top: 75%;
+            left: 15%;
+            animation-delay: -2s;
+        }
+
+        .light-line {
+            position: absolute;
+            width: 120%;
+            height: 1px;
+
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(210, 65, 255, .35),
+                rgba(255, 75, 190, .25),
+                transparent
+            );
+
+            transform: rotate(-15deg);
+            animation: lightMove 10s linear infinite;
+        }
+
+        .line-one {
+            top: 35%;
+            left: -10%;
+        }
+
+        .line-two {
+            top: 75%;
+            left: -10%;
+            animation-delay: -5s;
+        }
+
+        @keyframes bubbleFloat {
+            from {
+                transform: translate(0, 0) scale(1);
+                opacity: .4;
+            }
+
+            to {
+                transform: translate(35px, -30px) scale(1.2);
+                opacity: .85;
+            }
+        }
+
+        @keyframes lightMove {
+            0% {
+                transform: translateX(-5%) rotate(-15deg);
+                opacity: .2;
+            }
+
+            50% {
+                opacity: .8;
+            }
+
+            100% {
+                transform: translateX(5%) rotate(-15deg);
+                opacity: .2;
+            }
+        }
+
+        /* =====================================
+           HEADER
+        ===================================== */
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            display: grid;
+            place-items: center;
+            width: 45px;
+            height: 45px;
+            border-radius: 14px;
+
+            background: linear-gradient(
+                135deg,
+                #a020f0,
+                #168cff
+            );
+
+            font-size: 22px;
+            font-weight: 800;
+
+            box-shadow: 0 0 22px #c43cff77;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .brand h1 span {
+            color: #d88bff;
+        }
+
+        .brand p {
+            margin: 4px 0 0;
+            color: #aaa8c4;
+            font-size: 12px;
+        }
+
+        .back-button {
+            padding: 11px 17px;
+
+            border: 1px solid #7544b7;
+            border-radius: 11px;
+
+            color: #e8d8ff;
+            background: #21152e;
+
+            text-decoration: none;
+            font-size: 13px;
+
+            transition: .25s ease;
+        }
+
+        .back-button:hover {
+            border-color: #e078ff;
+            background: #352052;
+
+            box-shadow: 0 0 18px #d43cff55;
+        }
+
+        /* =====================================
+           PAGE HEADING
+        ===================================== */
+
+        .page-heading {
+            margin-bottom: 27px;
+        }
+
+        .page-heading h2 {
+            margin: 0 0 9px;
+            font-size: clamp(27px, 4vw, 35px);
+        }
+
+        .page-heading h2 span {
+            color: #d88bff;
+        }
+
+        .page-heading p {
+            margin: 0;
+            color: #aaa8c4;
+            font-size: 14px;
+        }
+
+        /* =====================================
+           FLASH MESSAGES
+        ===================================== */
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash-message {
+            padding: 13px 16px;
+            margin-bottom: 9px;
+
+            border: 1px solid #75418d;
+            border-radius: 10px;
+
+            background: #252039;
+            color: #e8d8ff;
+
+            font-size: 13px;
+        }
+
+        .flash-message.success {
+            border-color: #287c58;
+            background: #173d32;
+            color: #a9f4cb;
+        }
+
+        .flash-message.error {
+            border-color: #94445c;
+            background: #462437;
+            color: #ffc1d0;
+        }
+
+        /* =====================================
+           PREMIUM GLASS SEARCH PANEL
+        ===================================== */
+
+        .search-panel {
+            position: relative;
+
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+
+            padding: 19px;
+            margin-bottom: 25px;
+
+            background: linear-gradient(
+                135deg,
+                rgba(66, 35, 76, .72),
+                rgba(35, 22, 48, .82)
+            );
+
+            border: 1px solid rgba(214, 105, 255, .28);
+            border-radius: 18px;
+
+            box-shadow:
+                0 8px 30px rgba(0, 0, 0, .16),
+                inset 0 1px 0 rgba(255, 255, 255, .045);
+
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+
+            transition:
+                border-color .3s ease,
+                box-shadow .3s ease;
+        }
+
+        .search-panel:focus-within {
+            border-color: rgba(224, 112, 255, .55);
+
+            box-shadow:
+                0 8px 30px rgba(0, 0, 0, .2),
+                0 0 22px rgba(210, 65, 255, .09),
+                inset 0 1px 0 rgba(255, 255, 255, .06);
+        }
+
+        /* SEARCH INPUT */
+
+        .search-input {
+            flex: 1;
+            min-width: 190px;
+            min-height: 49px;
+            padding: 0 17px;
+
+            color: #fff2ff;
+            background: rgba(24, 15, 33, .85);
+
+            border: 1px solid rgba(181, 113, 213, .28);
+            border-radius: 12px;
+            outline: none;
+
+            font-family: inherit;
+            font-size: 13px;
+
+            transition:
+                border-color .3s ease,
+                background .3s ease,
+                box-shadow .3s ease;
+        }
+
+        .search-input::placeholder {
+            color: #9885a5;
+        }
+
+        .search-input:hover {
+            border-color: rgba(211, 111, 245, .5);
+            background: rgba(34, 20, 45, .95);
+        }
+
+        .search-input:focus {
+            border-color: #d74cff;
+            background: rgba(39, 22, 51, .98);
+
+            box-shadow:
+                0 0 0 3px rgba(213, 76, 255, .10),
+                0 0 16px rgba(213, 76, 255, .12);
+        }
+
+        /* FILTER DROPDOWN */
+
+        .filter-select {
+            min-width: 145px;
+            min-height: 49px;
+            padding: 0 15px;
+
+            color: #f5e7ff;
+            background: rgba(24, 15, 33, .9);
+
+            border: 1px solid rgba(181, 113, 213, .28);
+            border-radius: 12px;
+            outline: none;
+
+            font-family: inherit;
+            font-size: 12px;
+
+            cursor: pointer;
+            transition: .3s ease;
+        }
+
+        .filter-select:hover {
+            border-color: rgba(211, 111, 245, .55);
+        }
+
+        .filter-select:focus {
+            border-color: #d74cff;
+
+            box-shadow:
+                0 0 0 3px rgba(213, 76, 255, .10);
+        }
+
+        .filter-select option {
+            color: #f5e7ff;
+            background: #211329;
+        }
+
+        /* SEARCH BUTTON */
+
+        .search-button {
+            min-height: 49px;
+            padding: 0 25px;
+
+            border: 1px solid rgba(255, 170, 255, .15);
+            border-radius: 12px;
+
+            color: #ffffff;
+
+            background: linear-gradient(
+                110deg,
+                #a928ed,
+                #d532d7,
+                #e348bd
+            );
+
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 750;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 4px 15px rgba(198, 48, 226, .19);
+
+            transition:
+                transform .25s ease,
+                box-shadow .25s ease,
+                filter .25s ease;
+        }
+
+        .search-button:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.12);
+
+            box-shadow:
+                0 7px 23px rgba(210, 56, 228, .35),
+                0 0 15px rgba(221, 76, 255, .15);
+        }
+
+        .search-button:active {
+            transform: translateY(0) scale(.98);
+        }
+
+        .search-button:focus-visible {
+            outline: 2px solid #e7a0ff;
+            outline-offset: 3px;
+        }
+
+        /* =====================================
+           RESULTS
+        ===================================== */
+
+        .results-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin: 28px 0 17px;
+        }
+
+        .results-heading h3 {
+            margin: 0;
+            font-size: 19px;
+        }
+
+        .results-count {
+            color: #c59bd6;
+            font-size: 12px;
+        }
+
+        /* =====================================
+           ITEM GRID
+        ===================================== */
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 19px;
+        }
+
+        .item-card {
+            overflow: hidden;
+
+            border: 1px solid #493353;
+            border-radius: 18px;
+
+            background: linear-gradient(
+                145deg,
+                #281b35,
+                #1c1428
+            );
+
+            transition: .25s ease;
+        }
+
+        .item-card:hover {
+            transform: translateY(-5px);
+            border-color: #c65ce5;
+
+            box-shadow: 0 12px 32px #c43cff25;
+        }
+
+        .item-image {
+            display: grid;
+            place-items: center;
+
+            width: 100%;
+            height: 190px;
+
+            color: #a98bb9;
+            background: #292039;
+
+            font-size: 35px;
+        }
+
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-content {
+            padding: 19px;
+        }
+
+        .item-badges {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 7px;
+
+            font-size: 10px;
+            font-weight: 750;
+            text-transform: uppercase;
+        }
+
+        .badge.lost {
+            color: #ffc1d0;
+            background: #632b43;
+        }
+
+        .badge.found {
+            color: #a9f4cb;
+            background: #20543f;
+        }
+
+        .badge.status {
+            color: #e0b5ff;
+            background: #402653;
+        }
+
+        .item-content h3 {
+            margin: 0 0 9px;
+            font-size: 17px;
+            overflow-wrap: anywhere;
+        }
+
+        .item-description {
+            display: -webkit-box;
+            overflow: hidden;
+            min-height: 40px;
+            margin: 0 0 15px;
+
+            color: #b5a3c2;
+            font-size: 12px;
+            line-height: 1.6;
+
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+        }
+
+        .item-details {
+            display: grid;
+            gap: 9px;
+            padding-top: 13px;
+            border-top: 1px solid #493353;
+        }
+
+        .detail-row {
+            display: flex;
+            gap: 8px;
+
+            color: #b5a3c2;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .detail-row strong {
+            color: #eadcf0;
+            font-weight: 600;
+        }
+
+        /* =====================================
+           CLAIM SECTION
+        ===================================== */
+
+        .claim-section {
+            padding-top: 15px;
+            margin-top: 15px;
+            border-top: 1px solid #493353;
+        }
+
+        .claim-section p {
+            margin: 0 0 12px;
+            color: #c9bce0;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .claim-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            width: 100%;
+            min-height: 43px;
+            padding: 10px;
+
+            border-radius: 9px;
+
+            color: white;
+            background: linear-gradient(
+                105deg,
+                #a020f0,
+                #d43ccf
+            );
+
+            font-size: 12px;
+            font-weight: 750;
+            text-decoration: none;
+
+            transition: .25s ease;
+        }
+
+        .claim-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px #d43cff55;
+        }
+
+        .claim-note {
+            color: #b5a3c2;
+            font-size: 11px;
+        }
+
+        /* =====================================
+           EMPTY STATE
+        ===================================== */
+
+        .empty-state {
+            grid-column: 1 / -1;
+            padding: 65px 20px;
+
+            border: 1px dashed #75418d;
+            border-radius: 18px;
+
+            background: rgba(35, 24, 48, .93);
+            text-align: center;
+        }
+
+        .empty-icon {
+            margin-bottom: 15px;
+            color: #dc91ff;
+            font-size: 42px;
+        }
+
+        .empty-state h3 {
+            margin: 0 0 9px;
+            font-size: 19px;
+        }
+
+        .empty-state p {
+            margin: 0;
+            color: #b5a3c2;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .clear-link {
+            display: inline-block;
+            margin-top: 17px;
+
+            color: #df91ff;
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        .clear-link:hover {
+            color: #f0c5ff;
+        }
+
+        /* =====================================
+           FOOTER
+        ===================================== */
+
+        .page-footer {
+            margin-top: 40px;
+            color: #927d9e;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        /* =====================================
+           RESPONSIVE
+        ===================================== */
+
+        @media (max-width: 900px) {
+            .items-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .browse-page {
+                padding-top: 22px;
+            }
+
+            .brand h1 {
+                font-size: 17px;
+            }
+
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-panel {
+                flex-direction: column;
+                padding: 14px;
+                gap: 11px;
+            }
+
+            .search-input,
+            .filter-select,
+            .search-button {
+                width: 100%;
+                min-height: 47px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #particle-network,
+            .bubble,
+            .light-line {
+                display: none !important;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- BACKGROUND EFFECTS -->
+
+    <div class="background-effects">
+
+        <span class="bubble bubble-one"></span>
+        <span class="bubble bubble-two"></span>
+        <span class="bubble bubble-three"></span>
+        <span class="bubble bubble-four"></span>
+        <span class="bubble bubble-five"></span>
+
+        <div class="light-line line-one"></div>
+        <div class="light-line line-two"></div>
+
+    </div>
+
+    <!-- PARTICLE CANVAS -->
+
+    <canvas id="particle-network" aria-hidden="true"></canvas>
+
+    <!-- CUSTOM CURSOR -->
+
+    <div class="cursor-glow"></div>
+    <div class="custom-cursor"></div>
+    <div class="cursor-trail"></div>
+
+    <main class="browse-page">
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <div class="brand">
+
+                <div class="brand-icon">C</div>
+
+                <div>
+                    <h1>CEC <span>Lost & Found</span></h1>
+                    <p>Campus Lost & Found Portal</p>
+                </div>
+
+            </div>
+
+            <a class="back-button"
+               href="{{ url_for('student_dashboard') }}">
+                ← Dashboard
+            </a>
+
+        </header>
+
+        <!-- PAGE HEADING -->
+
+        <section class="page-heading">
+
+            <h2>Browse <span>Items</span></h2>
+
+            <p>
+                Discover lost and found belongings reported by
+                the campus community.
+            </p>
+
+        </section>
+
+        <!-- FLASH MESSAGES -->
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                <div class="flash-messages">
+
+                    {% for category, message in messages %}
+
+                        <div class="flash-message {{ category }}">
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        {% endwith %}
+
+        <!-- SEARCH FORM -->
+
+        <form class="search-panel"
+              method="GET"
+              action="{{ url_for('browse_items') }}">
+
+            <input
+                class="search-input"
+                type="search"
+                name="search"
+                value="{{ search }}"
+                placeholder="Search item name, category or location..."
+            >
+
+            <select class="filter-select" name="type">
+
+                <option value="all"
+                    {% if report_type == 'all' %}selected{% endif %}>
+                    All Items
+                </option>
+
+                <option value="lost"
+                    {% if report_type == 'lost' %}selected{% endif %}>
+                    Lost Items
+                </option>
+
+                <option value="found"
+                    {% if report_type == 'found' %}selected{% endif %}>
+                    Found Items
+                </option>
+
+            </select>
+
+            <button class="search-button" type="submit">
+                Search →
+            </button>
+
+        </form>
+
+        <!-- RESULTS HEADING -->
+
+        <div class="results-heading">
+
+            <h3>Reported Items</h3>
+
+            <span class="results-count">
+                {{ items|length }} result(s)
+            </span>
+
+        </div>
+
+        <!-- ITEMS GRID -->
+
+        <section class="items-grid">
+
+            {% for item in items %}
+
+                <article class="item-card">
+
+                    <!-- ITEM IMAGE -->
+
+                    <div class="item-image">
+
+                        {% if item.images %}
+
+                            <img
+                                src="{{ url_for('uploaded_file', filename=item.images[0].filename) }}"
+                                alt="{{ item.item_name }}"
+                            >
+
+                        {% else %}
+
+                            <span>◇</span>
+
+                        {% endif %}
+
+                    </div>
+
+                    <div class="item-content">
+
+                        <!-- ITEM BADGES -->
+
+                        <div class="item-badges">
+
+                            <span class="badge {{ item.report_type }}">
+                                {{ item.report_type }}
+                            </span>
+
+                            <span class="badge status">
+                                {{ item.status }}
+                            </span>
+
+                        </div>
+
+                        <!-- ITEM NAME -->
+
+                        <h3>{{ item.item_name }}</h3>
+
+                        <p class="item-description">
+                            {{ item.description }}
+                        </p>
+
+                        <!-- ITEM DETAILS -->
+
+                        <div class="item-details">
+
+                            <div class="detail-row">
+                                <strong>Category:</strong>
+                                {{ item.category }}
+                            </div>
+
+                            <div class="detail-row">
+                                <strong>Location:</strong>
+                                {{ item.location }}
+                            </div>
+
+                            <div class="detail-row">
+
+                                <strong>Date:</strong>
+
+                                {% if item.report_type == 'lost' %}
+
+                                    {{ item.date_lost.strftime('%d %b %Y') if item.date_lost else 'Not specified' }}
+
+                                {% else %}
+
+                                    {{ item.date_found.strftime('%d %b %Y') if item.date_found else 'Not specified' }}
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                        <!-- CLAIM SECTION -->
+
+                        {% if item.report_type == 'found'
+                              and item.user_id != session.get('user_id')
+                              and item.status == 'Active' %}
+
+                            <div class="claim-section">
+
+                                <p>
+                                    Is this your belonging? Provide
+                                    ownership details to request verification.
+                                </p>
+
+                                <a
+                                    class="claim-button"
+                                    href="{{ url_for('claim_item', item_id=item.id) }}"
+                                >
+                                    Verify Ownership →
+                                </a>
+
+                            </div>
+
+                        {% elif item.report_type == 'found'
+                              and item.user_id == session.get('user_id') %}
+
+                            <div class="claim-section">
+
+                                <span class="claim-note">
+                                    This is your own report.
+                                </span>
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </article>
+
+            {% else %}
+
+                <!-- EMPTY STATE -->
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">◇</div>
+
+                    <h3>No items found</h3>
+
+                    <p>
+                        There are no reports matching your search.
+                        Try another search or change the filter.
+                    </p>
+
+                    <a class="clear-link"
+                       href="{{ url_for('browse_items') }}">
+                        Clear search and view all items →
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+        </section>
+
+        <!-- FOOTER -->
+
+        <footer class="page-footer">
+            CEC Lost & Found · Secure Student Access
+        </footer>
+
+    </main>
+
+    <!-- =====================================
+         PINK / PURPLE PARTICLE ANIMATION
+    ====================================== -->
+
+    <script>
+    (() => {
+
+        const canvas = document.getElementById("particle-network");
+
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d");
+
+        if (!ctx) return;
+
+        const reducedMotion =
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        if (reducedMotion) return;
+
+        let width = 0;
+        let height = 0;
+        let dpr = 1;
+
+        const particles = [];
+
+        const MAX_PARTICLES = 150;
+        const DENSITY = 8500;
+        const CONNECTION_DISTANCE = 145;
+        const PARTICLE_SPEED = 0.38;
+        const MOUSE_RADIUS = 170;
+        const MOUSE_FORCE = 2.8;
+
+        const mouse = {
+            x: 0,
+            y: 0,
+            active: false
+        };
+
+        let animationFrame = null;
+        let running = true;
+
+        const pinkHues = [285, 300, 315, 325];
+
+        /* PARTICLE CLASS */
+
+        class Particle {
+
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+
+                this.vx = (Math.random() - 0.5) * PARTICLE_SPEED;
+                this.vy = (Math.random() - 0.5) * PARTICLE_SPEED;
+
+                this.radius = Math.random() * 1.8 + 0.7;
+
+                this.opacity = Math.random() * 0.55 + 0.25;
+
+                this.phase = Math.random() * Math.PI * 2;
+
+                this.pulseSpeed = Math.random() * 0.025 + 0.008;
+
+                this.hue = pinkHues[
+                    Math.floor(Math.random() * pinkHues.length)
+                ];
+
+            }
+
+            update() {
+
+                this.phase += this.pulseSpeed;
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                /* MOUSE INTERACTION */
+
+                if (mouse.active) {
+
+                    const dx = this.x - mouse.x;
+                    const dy = this.y - mouse.y;
+
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < MOUSE_RADIUS && distance > 0) {
+
+                        const force =
+                            (1 - distance / MOUSE_RADIUS) * MOUSE_FORCE;
+
+                        this.x += (dx / distance) * force;
+                        this.y += (dy / distance) * force;
+
+                    }
+
+                }
+
+                /* SCREEN BOUNDARIES */
+
+                if (this.x < -10) this.x = width + 10;
+                if (this.x > width + 10) this.x = -10;
+
+                if (this.y < -10) this.y = height + 10;
+                if (this.y > height + 10) this.y = -10;
+
+            }
+
+            draw() {
+
+                const pulse = 0.5 + Math.sin(this.phase) * 0.3;
+
+                const alpha = this.opacity * pulse;
+
+                const gradient = ctx.createRadialGradient(
+                    this.x,
+                    this.y,
+                    0,
+                    this.x,
+                    this.y,
+                    this.radius * 6
+                );
+
+                gradient.addColorStop(
+                    0,
+                    `hsla(${this.hue}, 100%, 80%, ${alpha})`
+                );
+
+                gradient.addColorStop(
+                    0.25,
+                    `hsla(${this.hue}, 100%, 65%, ${alpha * 0.45})`
+                );
+
+                gradient.addColorStop(
+                    1,
+                    `hsla(${this.hue}, 100%, 60%, 0)`
+                );
+
+                /* PARTICLE GLOW */
+
+                ctx.beginPath();
+
+                ctx.fillStyle = gradient;
+
+                ctx.arc(
+                    this.x,
+                    this.y,
+                    this.radius * 6,
+                    0,
+                    Math.PI * 2
+                );
+
+                ctx.fill();
+
+                /* PARTICLE CORE */
+
+                ctx.beginPath();
+
+                ctx.fillStyle =
+                    `rgba(255, 190, 255, ${alpha})`;
+
+                ctx.arc(
+                    this.x,
+                    this.y,
+                    this.radius,
+                    0,
+                    Math.PI * 2
+                );
+
+                ctx.fill();
+
+            }
+
+        }
+
+        /* RESIZE CANVAS */
+
+        function resizeCanvas() {
+
+            width = window.innerWidth;
+            height = window.innerHeight;
+
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+
+            canvas.style.width = width + "px";
+            canvas.style.height = height + "px";
+
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            const targetCount = Math.min(
+                MAX_PARTICLES,
+                Math.floor((width * height) / DENSITY)
+            );
+
+            while (particles.length < targetCount) {
+                particles.push(new Particle());
+            }
+
+            while (particles.length > targetCount) {
+                particles.pop();
+            }
+
+        }
+
+        /* CONNECT PARTICLES */
+
+        function drawConnections() {
+
+            for (let i = 0; i < particles.length; i++) {
+
+                for (let j = i + 1; j < particles.length; j++) {
+
+                    const a = particles[i];
+                    const b = particles[j];
+
+                    const dx = a.x - b.x;
+                    const dy = a.y - b.y;
+
+                    const distanceSquared = dx * dx + dy * dy;
+
+                    if (
+                        distanceSquared <
+                        CONNECTION_DISTANCE * CONNECTION_DISTANCE
+                    ) {
+
+                        const distance = Math.sqrt(distanceSquared);
+
+                        const opacity =
+                            (1 - distance / CONNECTION_DISTANCE) * 0.19;
+
+                        const gradient = ctx.createLinearGradient(
+                            a.x,
+                            a.y,
+                            b.x,
+                            b.y
+                        );
+
+                        gradient.addColorStop(
+                            0,
+                            `rgba(220, 80, 255, ${opacity})`
+                        );
+
+                        gradient.addColorStop(
+                            1,
+                            `rgba(255, 90, 190, ${opacity * 0.7})`
+                        );
+
+                        ctx.beginPath();
+
+                        ctx.strokeStyle = gradient;
+                        ctx.lineWidth = 0.7;
+
+                        ctx.moveTo(a.x, a.y);
+                        ctx.lineTo(b.x, b.y);
+
+                        ctx.stroke();
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        /* MOUSE GLOW */
+
+        function drawMouseField() {
+
+            if (!mouse.active) return;
+
+            const gradient = ctx.createRadialGradient(
+                mouse.x,
+                mouse.y,
+                0,
+                mouse.x,
+                mouse.y,
+                MOUSE_RADIUS
+            );
+
+            gradient.addColorStop(
+                0,
+                "rgba(220, 65, 255, 0.11)"
+            );
+
+            gradient.addColorStop(
+                0.55,
+                "rgba(255, 65, 190, 0.045)"
+            );
+
+            gradient.addColorStop(
+                1,
+                "rgba(255, 65, 190, 0)"
+            );
+
+            ctx.beginPath();
+
+            ctx.fillStyle = gradient;
+
+            ctx.arc(
+                mouse.x,
+                mouse.y,
+                MOUSE_RADIUS,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fill();
+
+        }
+
+        /* ANIMATION LOOP */
+
+        function animate() {
+
+            if (!running) return;
+
+            ctx.clearRect(0, 0, width, height);
+
+            drawMouseField();
+
+            for (const particle of particles) {
+                particle.update();
+            }
+
+            drawConnections();
+
+            for (const particle of particles) {
+                particle.draw();
+            }
+
+            animationFrame = requestAnimationFrame(animate);
+
+        }
+
+        /* MOUSE MOVEMENT */
+
+        window.addEventListener("pointermove", (event) => {
+
+            mouse.x = event.clientX;
+            mouse.y = event.clientY;
+            mouse.active = true;
+
+        }, { passive: true });
+
+        window.addEventListener("pointerleave", () => {
+
+            mouse.active = false;
+
+        });
+
+        /* RESIZE */
+
+        let resizeTimer;
+
+        window.addEventListener("resize", () => {
+
+            clearTimeout(resizeTimer);
+
+            resizeTimer = setTimeout(() => {
+                resizeCanvas();
+            }, 100);
+
+        }, { passive: true });
+
+        /* PAUSE WHEN TAB IS HIDDEN */
+
+        document.addEventListener("visibilitychange", () => {
+
+            if (document.hidden) {
+
+                running = false;
+
+                if (animationFrame !== null) {
+                    cancelAnimationFrame(animationFrame);
+                }
+
+            } else if (!running) {
+
+                running = true;
+                animate();
+
+            }
+
+        });
+
+        /* INITIALIZE */
+
+        resizeCanvas();
+        animate();
+
+    })();
+    </script>
+
+    <!-- EXISTING CUSTOM CURSOR -->
+
+    <script src="{{ url_for('static', filename='js/cursor.js') }}"></script>
+
+    <!-- FLASH MESSAGE ANIMATION -->
+
+    <script>
+        document.querySelectorAll(".flash-message").forEach(function(message) {
+
+            setTimeout(function() {
+
+                message.style.transition =
+                    "opacity 0.5s ease, transform 0.5s ease";
+
+                message.style.opacity = "0";
+                message.style.transform = "translateY(-10px)";
+
+                setTimeout(function() {
+                    message.remove();
+                }, 500);
+
+            }, 4000);
+
+        });
+    </script>
+
+</body>
+</html>

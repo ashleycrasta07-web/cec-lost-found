@@ -1,0 +1,35 @@
+# Python virtual environments
+venv/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploaded user images
+uploads/*
+!uploads/.gitkeep
+
+# Instance-specific files
+instance/*.db
+instance/*.sqlite
+instance/*.sqlite3
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+
+# Separate Git experiment repository
+tag/

@@ -1,0 +1,1477 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEC | Login</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --pink: #ff35b8;
+            --hot-pink: #ff159f;
+            --light-pink: #ff9cdd;
+            --magenta: #df36ad;
+            --purple: #a044e8;
+            --background: #160b20;
+            --text: #fff7ff;
+            --muted: #b9a9c8;
+        }
+
+        html {
+            min-height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 25px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            color: var(--text);
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background:
+                radial-gradient(
+                    ellipse at 10% 12%,
+                    rgba(255, 25, 155, .30),
+                    transparent 43%
+                ),
+                radial-gradient(
+                    ellipse at 90% 85%,
+                    rgba(215, 35, 165, .25),
+                    transparent 45%
+                ),
+                linear-gradient(
+                    135deg,
+                    #160b20,
+                    #24102d 50%,
+                    #120b20
+                );
+        }
+
+        /* ==================================
+           BACKGROUND EFFECTS
+        ================================== */
+
+        .background-effects {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        #particle-network {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .bubble {
+            position: absolute;
+            display: block;
+            border: 1px solid rgba(255, 125, 220, .35);
+            border-radius: 50%;
+            background: radial-gradient(
+                circle at 35% 30%,
+                rgba(255, 190, 235, .24),
+                rgba(255, 65, 180, .07) 50%,
+                transparent 75%
+            );
+            box-shadow:
+                inset 0 0 25px rgba(255, 115, 210, .12),
+                0 0 28px rgba(255, 45, 175, .12);
+            animation: bubbleFloat 12s ease-in-out infinite alternate;
+        }
+
+        .bubble-one {
+            width: 145px;
+            height: 145px;
+            top: 12%;
+            left: 7%;
+        }
+
+        .bubble-two {
+            width: 90px;
+            height: 90px;
+            top: 23%;
+            right: 13%;
+            animation-delay: -3s;
+        }
+
+        .bubble-three {
+            width: 185px;
+            height: 185px;
+            bottom: 8%;
+            left: 12%;
+            animation-delay: -6s;
+        }
+
+        .bubble-four {
+            width: 115px;
+            height: 115px;
+            right: 8%;
+            bottom: 17%;
+            animation-delay: -4s;
+        }
+
+        .bubble-five {
+            width: 65px;
+            height: 65px;
+            top: 50%;
+            left: 45%;
+            animation-delay: -8s;
+        }
+
+        @keyframes bubbleFloat {
+            from {
+                transform: translate3d(0, 0, 0);
+            }
+            to {
+                transform: translate3d(18px, -25px, 0);
+            }
+        }
+
+        .light-line {
+            position: absolute;
+            width: 110%;
+            height: 2px;
+            left: -5%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 55, 180, .8),
+                rgba(255, 160, 220, .9),
+                rgba(225, 50, 175, .7),
+                transparent
+            );
+            box-shadow: 0 0 13px rgba(255, 55, 180, .55);
+            opacity: .5;
+        }
+
+        .line-one {
+            top: 31%;
+            transform: rotate(-5deg);
+        }
+
+        .line-two {
+            bottom: 20%;
+            transform: rotate(-9deg);
+            opacity: .3;
+        }
+
+        /* ==================================
+           PAGE LAYOUT
+        ================================== */
+
+        .page-wrapper {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* ==================================
+           GLASS LOGIN CARD
+        ================================== */
+
+        .login-card {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            width: min(495px, 100%);
+            padding: 37px 40px 30px;
+            border: 1px solid rgba(255, 105, 205, .48);
+            border-radius: 27px;
+            background:
+                radial-gradient(
+                    circle at 50% 0%,
+                    rgba(255, 60, 180, .17),
+                    transparent 50%
+                ),
+                linear-gradient(
+                    145deg,
+                    rgba(48, 24, 53, .96),
+                    rgba(24, 17, 39, .97)
+                );
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            box-shadow:
+                0 25px 80px rgba(0, 0, 0, .42),
+                0 0 42px rgba(255, 45, 175, .16),
+                inset 0 1px rgba(255, 255, 255, .08);
+            animation: cardEntrance .75s ease both;
+        }
+
+        .login-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 83, 195, .42),
+                transparent 38%,
+                transparent 65%,
+                rgba(255, 105, 205, .25)
+            );
+            pointer-events: none;
+        }
+
+        .login-card::after {
+            content: "";
+            position: absolute;
+            top: -110px;
+            right: -110px;
+            z-index: -1;
+            width: 230px;
+            height: 230px;
+            border-radius: 50%;
+            background: rgba(255, 48, 174, .13);
+            filter: blur(55px);
+            pointer-events: none;
+        }
+
+        @keyframes cardEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(24px) scale(.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ==================================
+           BRAND
+        ================================== */
+
+        .brand {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .brand-icon {
+            display: grid;
+            place-items: center;
+            width: 62px;
+            height: 62px;
+            margin-bottom: 15px;
+            border-radius: 19px;
+            color: white;
+            font-size: 29px;
+            font-weight: 900;
+            background: linear-gradient(
+                135deg,
+                #ff32ad,
+                #bd36c9
+            );
+            box-shadow:
+                0 0 22px rgba(255, 45, 175, .48),
+                0 0 48px rgba(223, 50, 170, .22);
+            transition: transform .3s ease, box-shadow .3s ease;
+        }
+
+        .brand-icon:hover {
+            transform: translateY(-4px) rotate(-5deg);
+            box-shadow:
+                0 0 30px rgba(255, 45, 175, .65),
+                0 0 55px rgba(223, 50, 170, .3);
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 850;
+            letter-spacing: -1px;
+        }
+
+        .brand h1 span {
+            background: linear-gradient(
+                90deg,
+                #ff9bd8,
+                #ff55b8,
+                #e9a0ff
+            );
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand p {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        /* ==================================
+           FORM HEADING
+        ================================== */
+
+        .form-heading {
+            margin: 32px 0 27px;
+            text-align: center;
+        }
+
+        .form-heading h2 {
+            margin: 0 0 8px;
+            font-size: 26px;
+            font-weight: 850;
+            letter-spacing: -.8px;
+            text-shadow: 0 0 25px rgba(255, 105, 205, .22);
+        }
+
+        .form-heading p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        /* ==================================
+           FLASH MESSAGES
+        ================================== */
+
+        .flash-messages {
+            margin-bottom: 18px;
+        }
+
+        .flash-message {
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255, 105, 205, .35);
+            border-radius: 10px;
+            color: #ffe0f6;
+            background: rgba(155, 35, 115, .24);
+            font-size: 12px;
+            line-height: 1.5;
+            transition: opacity .5s ease, transform .5s ease;
+        }
+
+        .flash-message.error,
+        .flash-message.danger {
+            border-color: rgba(255, 113, 143, .5);
+            color: #ffc1d0;
+        }
+
+        .flash-message.success {
+            border-color: rgba(57, 214, 163, .5);
+            color: #a9f4cb;
+        }
+
+        .flash-message.fade-out {
+            opacity: 0;
+            transform: translateY(-8px);
+            pointer-events: none;
+        }
+
+        /* ==================================
+           LOGIN TYPE SWITCH
+        ================================== */
+
+        .login-label {
+            display: block;
+            margin-bottom: 10px;
+            color: #f6eaff;
+            font-size: 13px;
+            font-weight: 750;
+        }
+
+        .login-switch {
+            display: flex;
+            gap: 5px;
+            padding: 5px;
+            margin-bottom: 23px;
+            border: 1px solid rgba(255, 105, 205, .38);
+            border-radius: 15px;
+            background: rgba(22, 10, 30, .76);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, .2);
+        }
+
+        .login-option {
+            position: relative;
+            display: flex;
+            flex: 1;
+            align-items: center;
+            justify-content: center;
+            min-height: 43px;
+            border-radius: 11px;
+            color: #b9a6c8;
+            font-size: 13px;
+            font-weight: 750;
+            cursor: pointer;
+            transition: .25s ease;
+        }
+
+        .login-option input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+        }
+
+        .login-option:hover {
+            color: #ff9bd8;
+        }
+
+        .login-option.active {
+            color: white;
+            background: linear-gradient(
+                110deg,
+                #ff28a8,
+                #e83aa8,
+                #b52b9d
+            );
+            box-shadow:
+                0 0 20px rgba(255, 54, 184, .34),
+                inset 0 1px rgba(255, 255, 255, .2);
+        }
+
+        .login-option:focus-within {
+            outline: 2px solid #ff9bd8;
+            outline-offset: 2px;
+        }
+
+        /* ==================================
+           INPUT FIELDS
+        ================================== */
+
+        .input-group {
+            margin-bottom: 21px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #f6eaff;
+            font-size: 13px;
+            font-weight: 750;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            top: 50%;
+            left: 16px;
+            transform: translateY(-50%);
+            color: #e58bcf;
+            font-size: 17px;
+            pointer-events: none;
+        }
+
+        .input-group input {
+            width: 100%;
+            height: 54px;
+            padding: 0 48px;
+            border: 1px solid rgba(255, 105, 205, .40);
+            border-radius: 13px;
+            outline: none;
+            color: white;
+            background: rgba(28, 13, 37, .84);
+            font-family: inherit;
+            font-size: 13px;
+            transition:
+                border-color .25s ease,
+                box-shadow .25s ease,
+                background .25s ease,
+                transform .25s ease;
+        }
+
+        .input-group input::placeholder {
+            color: #8f819e;
+        }
+
+        .input-group input:hover {
+            border-color: rgba(255, 133, 215, .82);
+        }
+
+        .input-group input:focus {
+            border-color: #ff70c8;
+            background: rgba(47, 19, 49, .96);
+            box-shadow:
+                0 0 0 3px rgba(255, 54, 184, .14),
+                0 0 23px rgba(255, 54, 184, .20);
+            transform: translateY(-1px);
+        }
+
+        /* ==================================
+           PASSWORD VISIBILITY
+        ================================== */
+
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 13px;
+            display: grid;
+            place-items: center;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            transform: translateY(-50%);
+            border: none;
+            border-radius: 7px;
+            color: #e7a2dc;
+            background: transparent;
+            font-size: 17px;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .password-toggle:hover {
+            color: #ff8bd4;
+            background: rgba(255, 54, 184, .12);
+        }
+
+        /* ==================================
+           FORGOT PASSWORD
+        ================================== */
+
+        .forgot-password {
+            display: flex;
+            justify-content: flex-end;
+            margin: -4px 0 22px;
+        }
+
+        .forgot-password a {
+            color: #ff85d0;
+            font-size: 12px;
+            text-decoration: none;
+            transition: .25s ease;
+        }
+
+        .forgot-password a:hover {
+            color: #ffc0e8;
+            text-shadow: 0 0 12px rgba(255, 92, 194, .68);
+        }
+
+        /* ==================================
+           SIGN IN BUTTON
+        ================================== */
+
+        .register-button {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            min-height: 58px;
+            padding: 0 19px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, .18);
+            border-radius: 14px;
+            color: white;
+            background: linear-gradient(
+                105deg,
+                #ff28ad,
+                #e83aa8,
+                #b62b9d
+            );
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 850;
+            cursor: pointer;
+            box-shadow:
+                0 8px 25px rgba(255, 40, 174, .32),
+                inset 0 1px rgba(255, 255, 255, .2);
+            transition:
+                transform .3s ease,
+                box-shadow .3s ease,
+                filter .3s ease;
+        }
+
+        .register-button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -120%;
+            width: 65%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, .25),
+                transparent
+            );
+            transform: skewX(-20deg);
+            transition: left .65s ease;
+        }
+
+        .register-button:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.12);
+            box-shadow:
+                0 12px 32px rgba(255, 40, 174, .46),
+                0 0 25px rgba(255, 105, 205, .24);
+        }
+
+        .register-button:hover::before {
+            left: 140%;
+        }
+
+        .register-button:active {
+            transform: translateY(0) scale(.99);
+        }
+
+        .button-arrow {
+            position: relative;
+            display: grid;
+            place-items: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            background: rgba(255, 255, 255, .18);
+            font-size: 18px;
+        }
+
+        /* ==================================
+           REGISTRATION LINK AND FOOTER
+        ================================== */
+
+        .login-link {
+            margin: 24px 0 0;
+            color: var(--muted);
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .login-link a {
+            color: #ff85d0;
+            font-weight: 800;
+            text-decoration: none;
+            transition: .25s ease;
+        }
+
+        .login-link a:hover {
+            color: #ffc0e8;
+            text-shadow: 0 0 12px rgba(255, 92, 194, .68);
+        }
+
+        .footer-text {
+            padding-top: 21px;
+            margin: 26px 0 0;
+            border-top: 1px solid rgba(220, 120, 200, .15);
+            color: #a18ca9;
+            text-align: center;
+            font-size: 11px;
+            letter-spacing: .4px;
+        }
+
+        /* ==================================
+           CUSTOM CURSOR
+        ================================== */
+
+        .cursor-glow,
+        .custom-cursor {
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* ==================================
+           RESPONSIVE
+        ================================== */
+
+        @media (max-width: 600px) {
+            body {
+                padding: 18px 12px;
+            }
+
+            .login-card {
+                padding: 29px 22px 24px;
+                border-radius: 22px;
+            }
+
+            .brand h1 {
+                font-size: 23px;
+            }
+
+            .form-heading h2 {
+                font-size: 24px;
+            }
+
+            .input-group input {
+                height: 51px;
+            }
+
+            .bubble-three {
+                width: 120px;
+                height: 120px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .background-effects .bubble,
+            .login-card {
+                animation: none;
+            }
+
+            #particle-network {
+                display: none;
+            }
+
+            .brand-icon,
+            .register-button,
+            .input-group input {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- BACKGROUND EFFECTS -->
+
+    <div class="background-effects">
+        <span class="bubble bubble-one"></span>
+        <span class="bubble bubble-two"></span>
+        <span class="bubble bubble-three"></span>
+        <span class="bubble bubble-four"></span>
+        <span class="bubble bubble-five"></span>
+
+        <div class="light-line line-one"></div>
+        <div class="light-line line-two"></div>
+    </div>
+
+    <!-- NEURAL NETWORK CANVAS -->
+
+    <canvas id="particle-network" aria-hidden="true"></canvas>
+
+    <!-- LOGIN PAGE -->
+
+    <main class="page-wrapper">
+        <section class="register-card login-card">
+
+            <div class="brand">
+                <div class="brand-icon">C</div>
+                <h1>CEC <span>Lost &amp; Found</span></h1>
+                <p>Campus Lost &amp; Found Portal</p>
+            </div>
+
+            <div class="form-heading">
+                <h2>Welcome Back</h2>
+                <p>Sign in to your account</p>
+            </div>
+
+            <!-- FLASH MESSAGES -->
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- LOGIN FORM -->
+
+            <form method="POST" action="{{ url_for('login') }}" id="loginForm">
+
+                <!-- CSRF PROTECTION -->
+
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
+                <!-- LOGIN TYPE -->
+
+                <label class="login-label">Login As</label>
+
+                <div class="login-switch">
+
+                    <label class="login-option active" id="studentOption">
+                        <input
+                            type="radio"
+                            name="login_type"
+                            value="student"
+                            checked
+                        >
+                        Student
+                    </label>
+
+                    <label class="login-option" id="adminOption">
+                        <input
+                            type="radio"
+                            name="login_type"
+                            value="admin"
+                        >
+                        Admin
+                    </label>
+
+                </div>
+
+                <!-- USN / ADMIN USERNAME -->
+
+                <div class="input-group">
+
+                    <label for="identifier" id="identifierLabel">
+                        University Seat Number (USN)
+                    </label>
+
+                    <div class="input-wrapper">
+                        <span class="input-icon" aria-hidden="true">▤</span>
+
+                        <input
+                            type="text"
+                            id="identifier"
+                            name="identifier"
+                            placeholder="Enter your USN"
+                            maxlength="50"
+                            autocomplete="username"
+                            required
+                        >
+                    </div>
+
+                </div>
+
+                <!-- PASSWORD -->
+
+                <div class="input-group">
+
+                    <label for="password">Password</label>
+
+                    <div class="input-wrapper">
+                        <span class="input-icon" aria-hidden="true">◆</span>
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            id="passwordToggle"
+                            aria-label="Show password"
+                            aria-pressed="false"
+                        >◉</button>
+                    </div>
+
+                </div>
+
+                <!-- FORGOT PASSWORD -->
+
+                <p class="forgot-password">
+                    <a
+                        href="#"
+                        onclick="alert('Contact the CEC administrator to request a password reset.'); return false;"
+                    >
+                        Forgot Password?
+                    </a>
+                </p>
+
+                <!-- SIGN IN -->
+
+                <button type="submit" class="register-button">
+                    <span>Sign In</span>
+                    <span class="button-arrow">→</span>
+                </button>
+
+            </form>
+
+            <!-- REGISTRATION LINK -->
+
+            <p class="login-link">
+                Don't have an account?
+                <a href="{{ url_for('register') }}">
+                    Create Account
+                </a>
+            </p>
+
+            <p class="footer-text">
+                CEC Lost &amp; Found · Secure Access
+            </p>
+
+        </section>
+    </main>
+
+    <!-- CUSTOM CURSOR -->
+
+    <div class="cursor-glow"></div>
+    <div class="custom-cursor"></div>
+
+    <!-- ==================================
+         LOGIN SWITCH AND PASSWORD CONTROL
+    ================================== -->
+
+    <script>
+        const studentOption =
+            document.getElementById("studentOption");
+
+        const adminOption =
+            document.getElementById("adminOption");
+
+        const identifierLabel =
+            document.getElementById("identifierLabel");
+
+        const identifierInput =
+            document.getElementById("identifier");
+
+        function updateLoginMode() {
+            const selected = document.querySelector(
+                'input[name="login_type"]:checked'
+            ).value;
+
+            const isStudent = selected === "student";
+
+            studentOption.classList.toggle("active", isStudent);
+            adminOption.classList.toggle("active", !isStudent);
+
+            if (isStudent) {
+                identifierLabel.textContent =
+                    "University Seat Number (USN)";
+
+                identifierInput.placeholder = "Enter your USN";
+            } else {
+                identifierLabel.textContent = "Admin Username";
+
+                identifierInput.placeholder =
+                    "Enter admin username";
+            }
+
+            identifierInput.value = "";
+        }
+
+        document.querySelectorAll(
+            'input[name="login_type"]'
+        ).forEach(input => {
+            input.addEventListener("change", updateLoginMode);
+        });
+
+        // PASSWORD VISIBILITY
+
+        const passwordInput =
+            document.getElementById("password");
+
+        const passwordToggle =
+            document.getElementById("passwordToggle");
+
+        passwordToggle.addEventListener("click", function () {
+            const visible = passwordInput.type === "password";
+
+            passwordInput.type = visible ? "text" : "password";
+
+            passwordToggle.textContent = visible ? "◎" : "◉";
+
+            passwordToggle.setAttribute(
+                "aria-label",
+                visible ? "Hide password" : "Show password"
+            );
+
+            passwordToggle.setAttribute(
+                "aria-pressed",
+                String(visible)
+            );
+        });
+
+        // FLASH MESSAGE AUTO DISMISS
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const flashMessages = document.querySelectorAll(
+                ".flash-message"
+            );
+
+            flashMessages.forEach(function (message) {
+                setTimeout(function () {
+                    message.classList.add("fade-out");
+
+                    setTimeout(function () {
+                        message.remove();
+                    }, 500);
+
+                }, 4000);
+            });
+        });
+    </script>
+
+    <!-- ==================================
+         DENSE PINK NEURAL NETWORK
+    ================================== -->
+
+    <script>
+    (() => {
+        "use strict";
+
+        const canvas =
+            document.getElementById("particle-network");
+
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d");
+
+        if (!ctx) return;
+
+        const reducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        );
+
+        if (reducedMotion.matches) return;
+
+        let width = 0;
+        let height = 0;
+
+        let particles = [];
+
+        let animationId = null;
+        let lastFrameTime = 0;
+        let pageVisible = !document.hidden;
+
+        // MOUSE INTERACTION
+
+        const mouse = {
+            x: 0,
+            y: 0,
+            radius: 170,
+            active: false
+        };
+
+        // NETWORK SETTINGS
+
+        const settings = {
+            density: 6200,
+            maxParticles: 230,
+            connectionDistance: 180,
+            speed: 0.30,
+            mouseForce: 2.2
+        };
+
+        const FRAME_INTERVAL = 1000 / 30;
+
+        function random(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        // CREATE PARTICLE
+
+        function createParticle() {
+            const angle = random(0, Math.PI * 2);
+            const speed = random(0.15, settings.speed);
+
+            return {
+                x: random(0, width),
+                y: random(0, height),
+
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+
+                radius: random(1.2, 2.5),
+                alpha: random(0.4, 0.95),
+
+                color: Math.random() > 0.5
+                    ? "255, 65, 175"
+                    : "255, 105, 205",
+
+                phase: random(0, Math.PI * 2),
+                pulseSpeed: random(0.008, 0.025)
+            };
+        }
+
+        // RESIZE CANVAS
+
+        function resizeCanvas() {
+            const oldWidth = width;
+            const oldHeight = height;
+
+            width = window.innerWidth;
+            height = window.innerHeight;
+
+            const dpr = Math.min(
+                window.devicePixelRatio || 1,
+                1.5
+            );
+
+            canvas.width = Math.round(width * dpr);
+            canvas.height = Math.round(height * dpr);
+
+            canvas.style.width = width + "px";
+            canvas.style.height = height + "px";
+
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            const desiredCount = Math.min(
+                settings.maxParticles,
+                Math.max(
+                    75,
+                    Math.floor(
+                        (width * height) / settings.density
+                    )
+                )
+            );
+
+            if (particles.length > 0 && oldWidth && oldHeight) {
+                const scaleX = width / oldWidth;
+                const scaleY = height / oldHeight;
+
+                particles.forEach(p => {
+                    p.x *= scaleX;
+                    p.y *= scaleY;
+                });
+            }
+
+            while (particles.length < desiredCount) {
+                particles.push(createParticle());
+            }
+
+            if (particles.length > desiredCount) {
+                particles.length = desiredCount;
+            }
+
+            drawFrame();
+            lastFrameTime = 0;
+            scheduleFrame();
+        }
+
+        // UPDATE PARTICLES
+
+        function updateParticles() {
+            particles.forEach(p => {
+                p.phase += p.pulseSpeed;
+
+                p.x += p.vx;
+                p.y += p.vy;
+
+                // MOUSE REPULSION
+
+                if (mouse.active) {
+                    const dx = p.x - mouse.x;
+                    const dy = p.y - mouse.y;
+
+                    const distanceSquared = dx * dx + dy * dy;
+
+                    if (
+                        distanceSquared < mouse.radius * mouse.radius &&
+                        distanceSquared > 0
+                    ) {
+                        const distance = Math.sqrt(distanceSquared);
+
+                        const force =
+                            (mouse.radius - distance) / mouse.radius;
+
+                        const push = force * settings.mouseForce;
+
+                        p.x += (dx / distance) * push;
+                        p.y += (dy / distance) * push;
+                    }
+                }
+
+                // SCREEN BOUNDARIES
+
+                if (p.x < 0) {
+                    p.x = 0;
+                    p.vx *= -1;
+                }
+
+                if (p.x > width) {
+                    p.x = width;
+                    p.vx *= -1;
+                }
+
+                if (p.y < 0) {
+                    p.y = 0;
+                    p.vy *= -1;
+                }
+
+                if (p.y > height) {
+                    p.y = height;
+                    p.vy *= -1;
+                }
+            });
+        }
+
+        // DRAW PARTICLES
+
+        function drawParticles() {
+            particles.forEach(p => {
+                const pulse =
+                    0.65 + Math.sin(p.phase) * 0.35;
+
+                const glowRadius = p.radius * 5;
+
+                const glow = ctx.createRadialGradient(
+                    p.x, p.y, 0,
+                    p.x, p.y, glowRadius
+                );
+
+                glow.addColorStop(
+                    0,
+                    `rgba(${p.color}, ${p.alpha * pulse})`
+                );
+
+                glow.addColorStop(
+                    1,
+                    `rgba(${p.color}, 0)`
+                );
+
+                ctx.beginPath();
+                ctx.fillStyle = glow;
+
+                ctx.arc(
+                    p.x,
+                    p.y,
+                    glowRadius,
+                    0,
+                    Math.PI * 2
+                );
+
+                ctx.fill();
+
+                // BRIGHT PARTICLE CENTRE
+
+                ctx.beginPath();
+
+                ctx.fillStyle =
+                    `rgba(255, 225, 250, ${p.alpha * pulse})`;
+
+                ctx.arc(
+                    p.x,
+                    p.y,
+                    p.radius,
+                    0,
+                    Math.PI * 2
+                );
+
+                ctx.fill();
+            });
+        }
+
+        // CONNECT PARTICLES
+
+        function drawConnections() {
+            const maxDistanceSquared =
+                settings.connectionDistance ** 2;
+
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const p1 = particles[i];
+                    const p2 = particles[j];
+
+                    const dx = p1.x - p2.x;
+                    const dy = p1.y - p2.y;
+
+                    const distanceSquared =
+                        dx * dx + dy * dy;
+
+                    if (distanceSquared >= maxDistanceSquared) {
+                        continue;
+                    }
+
+                    const distance = Math.sqrt(distanceSquared);
+
+                    const opacity =
+                        (1 - distance / settings.connectionDistance) * 0.48;
+
+                    ctx.beginPath();
+
+                    ctx.strokeStyle =
+                        `rgba(255, 85, 190, ${opacity})`;
+
+                    ctx.lineWidth = 0.85;
+
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // MOUSE ENERGY FIELD
+
+        function drawMouseEnergy() {
+            if (!mouse.active) return;
+
+            const energy = ctx.createRadialGradient(
+                mouse.x,
+                mouse.y,
+                0,
+                mouse.x,
+                mouse.y,
+                mouse.radius
+            );
+
+            energy.addColorStop(
+                0,
+                "rgba(255, 65, 185, .12)"
+            );
+
+            energy.addColorStop(
+                .45,
+                "rgba(255, 85, 195, .055)"
+            );
+
+            energy.addColorStop(
+                1,
+                "rgba(255, 85, 195, 0)"
+            );
+
+            ctx.beginPath();
+            ctx.fillStyle = energy;
+
+            ctx.arc(
+                mouse.x,
+                mouse.y,
+                mouse.radius,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fill();
+        }
+
+        // DRAW COMPLETE FRAME
+
+        function drawFrame() {
+            ctx.clearRect(0, 0, width, height);
+
+            drawConnections();
+            drawParticles();
+            drawMouseEnergy();
+        }
+
+        // ANIMATION LOOP
+
+        function animate(timestamp) {
+            animationId = null;
+
+            if (!pageVisible) return;
+
+            if (
+                lastFrameTime &&
+                timestamp - lastFrameTime < FRAME_INTERVAL
+            ) {
+                scheduleFrame();
+                return;
+            }
+
+            lastFrameTime = timestamp;
+
+            updateParticles();
+            drawFrame();
+
+            scheduleFrame();
+        }
+
+        function scheduleFrame() {
+            if (
+                pageVisible &&
+                animationId === null
+            ) {
+                animationId = requestAnimationFrame(animate);
+            }
+        }
+
+        // MOUSE MOVEMENT
+
+        window.addEventListener(
+            "pointermove",
+            function(event) {
+                if (event.pointerType === "touch") return;
+
+                mouse.x = event.clientX;
+                mouse.y = event.clientY;
+                mouse.active = true;
+            },
+            { passive: true }
+        );
+
+        window.addEventListener(
+            "pointerout",
+            function(event) {
+                if (!event.relatedTarget) {
+                    mouse.active = false;
+                }
+            },
+            { passive: true }
+        );
+
+        window.addEventListener(
+            "pointerdown",
+            function(event) {
+                if (event.pointerType === "touch") return;
+
+                mouse.x = event.clientX;
+                mouse.y = event.clientY;
+                mouse.active = true;
+            },
+            { passive: true }
+        );
+
+        // RESIZE HANDLING
+
+        let resizeTimer = null;
+
+        window.addEventListener(
+            "resize",
+            function() {
+                clearTimeout(resizeTimer);
+
+                resizeTimer = setTimeout(
+                    resizeCanvas,
+                    120
+                );
+            },
+            { passive: true }
+        );
+
+        // PAUSE WHEN TAB IS HIDDEN
+
+        document.addEventListener(
+            "visibilitychange",
+            function() {
+                pageVisible = !document.hidden;
+
+                if (!pageVisible) {
+                    if (animationId !== null) {
+                        cancelAnimationFrame(animationId);
+                        animationId = null;
+                    }
+                } else {
+                    lastFrameTime = 0;
+                    scheduleFrame();
+                }
+            }
+        );
+
+        // INITIALIZE
+
+        resizeCanvas();
+        scheduleFrame();
+
+    })();
+    </script>
+
+    <!-- CUSTOM CURSOR SCRIPT -->
+
+    <script src="{{ url_for('static', filename='js/cursor.js') }}?v=3"></script>
+
+</body>
+</html>

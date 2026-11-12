@@ -1,0 +1,1040 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEC | My Notifications</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <style>
+        :root {
+            --pink: #e04de8;
+            --purple: #a020f0;
+            --lavender: #ca83ff;
+            --text: #f7f2ff;
+            --muted: #aaa0bd;
+            --border: rgba(190, 91, 231, .25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(
+                    ellipse at 12% 20%,
+                    rgba(160, 32, 240, .20),
+                    transparent 40%
+                ),
+                radial-gradient(
+                    ellipse at 90% 75%,
+                    rgba(224, 77, 232, .13),
+                    transparent 40%
+                ),
+                linear-gradient(
+                    135deg,
+                    #100817,
+                    #1c102b 50%,
+                    #100817
+                );
+            background-attachment: fixed;
+        }
+
+        /* NEURAL NETWORK BACKGROUND */
+
+        #neural-network {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* MAIN CONTAINER */
+
+        .container {
+            position: relative;
+            z-index: 2;
+            width: min(1100px, 92%);
+            margin: auto;
+            padding: 30px 0 40px;
+        }
+
+        /* NAVIGATION */
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 65px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: -.5px;
+        }
+
+        .brand-icon {
+            display: grid;
+            place-items: center;
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            color: white;
+            background: linear-gradient(135deg, #a020f0, #e04de8);
+            box-shadow: 0 0 24px rgba(160, 32, 240, .42);
+        }
+
+        .brand span {
+            color: var(--lavender);
+        }
+
+        .back-button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 19px;
+            border: 1px solid rgba(185, 91, 231, .48);
+            border-radius: 12px;
+            color: #eadbff;
+            background: rgba(39, 25, 54, .78);
+            text-decoration: none;
+            font-size: 13px;
+            transition: .25s ease;
+        }
+
+        .back-button:hover {
+            border-color: var(--lavender);
+            background: rgba(83, 42, 111, .75);
+            box-shadow: 0 0 20px rgba(160, 32, 240, .25);
+            transform: translateY(-2px);
+        }
+
+        /* PAGE HEADING */
+
+        .page-heading {
+            margin-bottom: 34px;
+        }
+
+        .page-heading h1 {
+            margin-bottom: 10px;
+            font-size: clamp(30px, 4vw, 40px);
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .page-heading h1 span {
+            color: var(--lavender);
+        }
+
+        .page-heading p {
+            max-width: 650px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* NOTIFICATION SUMMARY */
+
+        .notification-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 23px;
+        }
+
+        .notification-summary p {
+            color: #c0b2ce;
+            font-size: 14px;
+        }
+
+        .unread-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border: 1px solid rgba(190, 91, 231, .4);
+            border-radius: 30px;
+            color: #e2b5ff;
+            background: rgba(112, 44, 157, .24);
+            box-shadow: 0 0 18px rgba(160, 32, 240, .10);
+            font-size: 12px;
+            font-weight: 650;
+        }
+
+        .unread-count::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #d76cff;
+            box-shadow: 0 0 10px #d76cff;
+        }
+
+        /* NOTIFICATION LIST */
+
+        .notifications-list {
+            display: grid;
+            gap: 18px;
+        }
+
+        /* NOTIFICATION CARD */
+
+        .notification-card {
+            position: relative;
+            overflow: hidden;
+            padding: 25px;
+            border: 1px solid rgba(190, 91, 231, .22);
+            border-radius: 18px;
+            background: linear-gradient(
+                145deg,
+                rgba(40, 28, 55, .94),
+                rgba(27, 25, 47, .96)
+            );
+            backdrop-filter: blur(18px);
+            box-shadow: 0 9px 30px rgba(0, 0, 0, .17);
+            transition:
+                transform .3s ease,
+                border-color .3s ease,
+                box-shadow .3s ease;
+        }
+
+        .notification-card::after {
+            content: "";
+            position: absolute;
+            top: -80px;
+            right: -65px;
+            width: 170px;
+            height: 170px;
+            border: 1px solid rgba(202, 131, 255, .10);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .notification-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(221, 112, 255, .65);
+            box-shadow: 0 14px 38px rgba(160, 32, 240, .15);
+        }
+
+        /* UNREAD CARD */
+
+        .notification-card.unread {
+            border-left: 4px solid #d45cff;
+            background: linear-gradient(
+                110deg,
+                rgba(66, 36, 88, .94),
+                rgba(31, 25, 52, .96)
+            );
+            box-shadow: 0 8px 30px rgba(160, 32, 240, .10);
+        }
+
+        .notification-card.unread:hover {
+            box-shadow: 0 14px 38px rgba(160, 32, 240, .22);
+        }
+
+        /* CARD HEADER */
+
+        .notification-top {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 17px;
+        }
+
+        .notification-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #faf5ff;
+            font-size: 17px;
+            font-weight: 750;
+        }
+
+        .notification-icon {
+            display: grid;
+            place-items: center;
+            width: 35px;
+            height: 35px;
+            flex-shrink: 0;
+            border-radius: 11px;
+            color: #e7baff;
+            background: rgba(160, 32, 240, .20);
+            font-size: 17px;
+        }
+
+        .notification-card.unread .notification-icon {
+            color: white;
+            background: linear-gradient(135deg, #a020f0, #df4de8);
+            box-shadow: 0 0 17px rgba(190, 60, 240, .28);
+        }
+
+        /* READ / UNREAD BADGES */
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            border: 1px solid transparent;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 750;
+            text-transform: uppercase;
+            letter-spacing: .35px;
+        }
+
+        .status.unread-status {
+            border-color: rgba(205, 116, 255, .25);
+            color: #e3b9ff;
+            background: rgba(147, 51, 234, .20);
+        }
+
+        .status.unread-status::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #d76cff;
+            box-shadow: 0 0 8px #d76cff;
+        }
+
+        .status.read-status {
+            color: #aaa5ba;
+            background: rgba(120, 120, 140, .16);
+        }
+
+        /* MESSAGE */
+
+        .notification-message {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 17px;
+            color: #e3dced;
+            font-size: 15px;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+        }
+
+        /* RECEIVED DATE */
+
+        .notification-date {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: #a69ab6;
+            font-size: 11px;
+        }
+
+        .notification-date::before {
+            content: "◷";
+            color: var(--lavender);
+            font-size: 14px;
+        }
+
+        /* ACTIONS */
+
+        .notification-actions {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 11px;
+            margin-top: 21px;
+        }
+
+        .action-button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            min-height: 41px;
+            padding: 11px 18px;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            color: white;
+            background: linear-gradient(110deg, #a020f0, #e04de8);
+            box-shadow: 0 5px 17px rgba(160, 32, 240, .23);
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 750;
+            text-decoration: none;
+            cursor: pointer;
+            transition: .25s ease;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(190, 56, 240, .38);
+            filter: brightness(1.08);
+        }
+
+        .read-button {
+            border-color: rgba(187, 112, 246, .38);
+            color: #e2c4ff;
+            background: rgba(107, 54, 145, .24);
+            box-shadow: none;
+        }
+
+        .read-button:hover {
+            border-color: #d28aff;
+            background: rgba(132, 61, 180, .42);
+            box-shadow: 0 0 17px rgba(160, 32, 240, .18);
+        }
+
+        .notification-actions form {
+            margin: 0;
+        }
+
+        /* EMPTY STATE */
+
+        .empty-state {
+            padding: 75px 20px;
+            border: 1px dashed rgba(191, 112, 234, .45);
+            border-radius: 19px;
+            background: rgba(39, 25, 54, .80);
+            text-align: center;
+            backdrop-filter: blur(15px);
+        }
+
+        .empty-icon {
+            display: grid;
+            place-items: center;
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 19px;
+            border: 1px solid rgba(194, 111, 255, .30);
+            border-radius: 23px;
+            color: #d28aff;
+            background: rgba(160, 32, 240, .16);
+            box-shadow: 0 0 26px rgba(160, 32, 240, .15);
+            font-size: 35px;
+        }
+
+        .empty-state h2 {
+            margin-bottom: 12px;
+            font-size: 21px;
+        }
+
+        .empty-state p {
+            max-width: 440px;
+            margin: auto;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        /* FOOTER */
+
+        .footer {
+            margin-top: 55px;
+            padding: 20px 0;
+            border-top: 1px solid rgba(190, 130, 218, .12);
+            color: #897b9a;
+            text-align: center;
+            font-size: 11px;
+        }
+
+        /* CUSTOM CURSOR */
+
+        .cursor-glow,
+        .custom-cursor,
+        .cursor-trail {
+            pointer-events: none;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 650px) {
+            .container {
+                width: 92%;
+                padding-top: 22px;
+            }
+
+            .navbar {
+                margin-bottom: 43px;
+            }
+
+            .brand {
+                font-size: 17px;
+            }
+
+            .brand-icon {
+                width: 41px;
+                height: 41px;
+            }
+
+            .back-button {
+                padding: 10px 12px;
+                font-size: 11px;
+            }
+
+            .page-heading h1 {
+                font-size: 31px;
+            }
+
+            .notification-card {
+                padding: 19px;
+            }
+
+            .notification-message {
+                font-size: 13px;
+            }
+
+            .notification-title {
+                font-size: 15px;
+            }
+
+            .notification-actions {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .notification-actions form,
+            .notification-actions .action-button {
+                width: 100%;
+            }
+
+            .notification-actions form button {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .navbar {
+                align-items: flex-start;
+            }
+
+            .brand {
+                gap: 8px;
+                font-size: 15px;
+            }
+
+            .back-button {
+                padding: 9px;
+                font-size: 10px;
+            }
+
+            .notification-summary {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ANIMATED NEURAL NETWORK -->
+
+    <canvas id="neural-network" aria-hidden="true"></canvas>
+
+    <!-- CUSTOM CURSOR -->
+
+    <div class="cursor-glow"></div>
+    <div class="custom-cursor"></div>
+    <div class="cursor-trail"></div>
+
+    <div class="container">
+
+        <!-- NAVIGATION -->
+
+        <nav class="navbar">
+
+            <div class="brand">
+                <div class="brand-icon">C</div>
+                <div>
+                    CEC <span>Lost &amp; Found</span>
+                </div>
+            </div>
+
+            <a href="{{ url_for('student_dashboard') }}"
+               class="back-button">
+                ← Dashboard
+            </a>
+
+        </nav>
+
+        <!-- PAGE HEADING -->
+
+        <header class="page-heading">
+
+            <h1>My <span>Notifications</span></h1>
+
+            <p>
+                Stay updated about your submitted claims and their verification status.
+            </p>
+
+        </header>
+
+        <!-- NOTIFICATION SUMMARY -->
+
+        <div class="notification-summary">
+
+            <p>
+                You have {{ notifications|length }} notification(s).
+            </p>
+
+            <span class="unread-count">
+                {{ unread_count }} Unread
+            </span>
+
+        </div>
+
+        <!-- NOTIFICATIONS -->
+
+        {% if notifications %}
+
+            <section class="notifications-list">
+
+                {% for notification in notifications %}
+
+                    <article class="notification-card
+                        {% if not notification.is_read %}unread{% endif %}">
+
+                        <!-- NOTIFICATION HEADER -->
+
+                        <div class="notification-top">
+
+                            <div class="notification-title">
+
+                                <span class="notification-icon">
+
+                                    {% if notification.claim and notification.claim.status == "Approved" %}
+                                        ✓
+                                    {% elif notification.claim and notification.claim.status == "Rejected" %}
+                                        ✕
+                                    {% else %}
+                                        ◇
+                                    {% endif %}
+
+                                </span>
+
+                                <span>
+
+                                    {% if notification.claim and notification.claim.status == "Approved" %}
+                                        Claim Approved
+                                    {% elif notification.claim and notification.claim.status == "Rejected" %}
+                                        Claim Rejected
+                                    {% else %}
+                                        Notification
+                                    {% endif %}
+
+                                </span>
+
+                            </div>
+
+                            {% if notification.is_read %}
+
+                                <span class="status read-status">
+                                    Read
+                                </span>
+
+                            {% else %}
+
+                                <span class="status unread-status">
+                                    New
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                        <!-- NOTIFICATION MESSAGE -->
+
+                        <p class="notification-message">
+                            {{ notification.message }}
+                        </p>
+
+                        <!-- RECEIVED DATE -->
+
+                        <p class="notification-date">
+
+                            Received:
+                            {{ notification.created_at.strftime("%d %b %Y, %I:%M %p") }}
+
+                        </p>
+
+                        <!-- ACTIONS -->
+
+                        <div class="notification-actions">
+
+                            {% if notification.claim %}
+
+                                <a href="{{ url_for('my_claims') }}"
+                                   class="action-button">
+                                    View My Claims →
+                                </a>
+
+                            {% endif %}
+
+                            {% if not notification.is_read %}
+
+                                <form method="POST"
+                                      action="{{ url_for('mark_notification_read',
+                                      notification_id=notification.id) }}">
+
+                                    <input
+                                        type="hidden"
+                                        name="csrf_token"
+                                        value="{{ csrf_token() }}"
+                                    >
+
+                                    <button type="submit"
+                                            class="action-button read-button">
+                                        ✓ Mark as Read
+                                    </button>
+
+                                </form>
+
+                            {% endif %}
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </section>
+
+        {% else %}
+
+            <!-- EMPTY STATE -->
+
+            <div class="empty-state">
+
+                <div class="empty-icon">◇</div>
+
+                <h2>No Notifications Yet</h2>
+
+                <p>
+                    You will receive notifications here when an administrator
+                    reviews your claims.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+        <!-- FOOTER -->
+
+        <footer class="footer">
+            CEC Lost &amp; Found · Secure Student Access
+        </footer>
+
+    </div>
+
+    <!-- NEURAL NETWORK ANIMATION -->
+
+    <script>
+    (() => {
+
+        const canvas = document.getElementById("neural-network");
+        const ctx = canvas.getContext("2d");
+
+        if (!ctx) return;
+
+        const reducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        ).matches;
+
+        let width = 0;
+        let height = 0;
+        let particles = [];
+        let animationId = null;
+
+        const mouse = {
+            x: null,
+            y: null,
+            radius: 170
+        };
+
+        function resize() {
+
+            const dpr = Math.min(
+                window.devicePixelRatio || 1,
+                2
+            );
+
+            width = window.innerWidth;
+            height = window.innerHeight;
+
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+
+            canvas.style.width = width + "px";
+            canvas.style.height = height + "px";
+
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            createParticles();
+            draw();
+
+        }
+
+        function createParticles() {
+
+            particles = [];
+
+            const isMobile = width < 700;
+
+            const count = Math.min(
+                isMobile ? 75 : 160,
+                Math.floor(
+                    (width * height) / (isMobile ? 6500 : 8500)
+                )
+            );
+
+            for (let i = 0; i < count; i++) {
+
+                particles.push({
+
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+
+                    vx: (Math.random() - 0.5) * 0.42,
+                    vy: (Math.random() - 0.5) * 0.42,
+
+                    radius: Math.random() * 2 + 1,
+
+                    phase: Math.random() * Math.PI * 2
+
+                });
+
+            }
+
+        }
+
+        function draw() {
+
+            ctx.clearRect(0, 0, width, height);
+
+            /* PARTICLE MOVEMENT */
+
+            particles.forEach(p => {
+
+                p.phase += 0.025;
+
+                if (!reducedMotion) {
+
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0 || p.x > width) {
+                        p.vx *= -1;
+                    }
+
+                    if (p.y < 0 || p.y > height) {
+                        p.vy *= -1;
+                    }
+
+                    /* CURSOR INTERACTION */
+
+                    if (mouse.x !== null && mouse.y !== null) {
+
+                        const dx = p.x - mouse.x;
+                        const dy = p.y - mouse.y;
+
+                        const distance = Math.hypot(dx, dy);
+
+                        if (distance < mouse.radius && distance > 0) {
+
+                            const force =
+                                (mouse.radius - distance) / mouse.radius;
+
+                            p.x += (dx / distance) * force * 1.2;
+                            p.y += (dy / distance) * force * 1.2;
+
+                        }
+
+                    }
+
+                }
+
+            });
+
+            /* CONNECT NEARBY NODES */
+
+            for (let i = 0; i < particles.length; i++) {
+
+                for (let j = i + 1; j < particles.length; j++) {
+
+                    const a = particles[i];
+                    const b = particles[j];
+
+                    const dx = a.x - b.x;
+                    const dy = a.y - b.y;
+
+                    const distance = Math.hypot(dx, dy);
+
+                    if (distance < 145) {
+
+                        const opacity =
+                            (1 - distance / 145) * 0.32;
+
+                        ctx.beginPath();
+
+                        ctx.moveTo(a.x, a.y);
+                        ctx.lineTo(b.x, b.y);
+
+                        ctx.strokeStyle =
+                            `rgba(190, 82, 255, ${opacity})`;
+
+                        ctx.lineWidth = 0.8;
+                        ctx.stroke();
+
+                    }
+
+                }
+
+            }
+
+            /* DRAW GLOWING NODES */
+
+            particles.forEach(p => {
+
+                const glow =
+                    0.65 + Math.sin(p.phase) * 0.3;
+
+                ctx.beginPath();
+
+                ctx.arc(
+                    p.x,
+                    p.y,
+                    p.radius,
+                    0,
+                    Math.PI * 2
+                );
+
+                ctx.fillStyle =
+                    `rgba(230, 115, 255, ${glow})`;
+
+                ctx.shadowBlur = 17;
+                ctx.shadowColor = "#d946ef";
+
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+
+            });
+
+            /* CURSOR CONNECTIONS */
+
+            if (mouse.x !== null && mouse.y !== null) {
+
+                particles.forEach(p => {
+
+                    const dx = p.x - mouse.x;
+                    const dy = p.y - mouse.y;
+
+                    const distance = Math.hypot(dx, dy);
+
+                    if (distance < mouse.radius) {
+
+                        const opacity =
+                            (1 - distance / mouse.radius) * 0.5;
+
+                        ctx.beginPath();
+
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(mouse.x, mouse.y);
+
+                        ctx.strokeStyle =
+                            `rgba(235, 110, 255, ${opacity})`;
+
+                        ctx.lineWidth = 0.8;
+                        ctx.stroke();
+
+                    }
+
+                });
+
+            }
+
+            if (!reducedMotion) {
+                animationId = requestAnimationFrame(draw);
+            }
+
+        }
+
+        /* MOUSE MOVEMENT */
+
+        window.addEventListener("mousemove", event => {
+
+            mouse.x = event.clientX;
+            mouse.y = event.clientY;
+
+        });
+
+        window.addEventListener("mouseout", event => {
+
+            if (!event.relatedTarget) {
+
+                mouse.x = null;
+                mouse.y = null;
+
+            }
+
+        });
+
+        /* WINDOW RESIZE */
+
+        window.addEventListener("resize", () => {
+
+            if (animationId !== null) {
+                cancelAnimationFrame(animationId);
+            }
+
+            resize();
+
+        });
+
+        resize();
+
+    })();
+    </script>
+
+    <!-- EXISTING CUSTOM CURSOR -->
+
+    <script src="{{ url_for('static', filename='js/cursor.js') }}"></script>
+
+</body>
+</html>
